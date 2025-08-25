@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: bhashini-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=your_secure_admin_password
+      - DOCKER_INFLUXDB_INIT_ORG_NAME=bhashini
+      - DOCKER_INFLUXDB_INIT_BUCKET_NAME=qos_metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=your_admin_token_here
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - ./influxdb/init-scripts:/docker-entrypoint-initdb.d
+      - ./secrets:/secrets
+    networks:
+      - bhashini-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: bhashini-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/provider-dashboards
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=5s
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_UID=bhashini-provider-overview
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/entrypoint.sh:/entrypoint.sh
+      - ./secrets:/secrets
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    networks:
+      - bhashini-network
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  data-simulator:
+    build:
+      context: ./data-simulator
+      dockerfile: Dockerfile
+    container_name: bhashini-data-simulator
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=your_admin_token_here
+      - INFLUXDB_ORG=bhashini
+      - INFLUXDB_BUCKET=qos_metrics
+      - SIMULATION_INTERVAL=${SIMULATION_INTERVAL:-10}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./config:/app/config
+      - ./secrets/influxdb_tokens.env
+      - .env
+    networks:
+      - bhashini-network
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  influxdb_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  bhashini-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

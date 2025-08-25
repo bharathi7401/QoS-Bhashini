@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: 'provider-dashboards'
+    orgId: 1
+    folder: 'Bhashini Provider'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/provider-dashboards
+      foldersFromFilesStructure: true

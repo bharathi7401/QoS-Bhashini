@@ -1,0 +1,40 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB-Customer-Tenant
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    secureJsonData:
+      token: ${INFLUXDB_CUSTOMER_1_TOKEN}
+    jsonData:
+      version: Flux
+      organization: ${INFLUXDB_ORG}
+      defaultBucket: ${INFLUXDB_BUCKET}
+      tlsSkipVerify: true
+      httpMethod: POST
+      queryTimeout: 60s
+      maxSeries: 10000
+      defaultQuery: |
+        // Customer tenant-isolated query template
+        // Automatically filters by tenant_id for data isolation
+        from(bucket: "${INFLUXDB_BUCKET}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
+          |> filter(fn: (r) => r["tenant_id"] == "enterprise_1")
+          |> group(columns: ["service_name", "metric_type"])
+          |> mean()
+          |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+    editable: false
+    isDefault: false
+    templating:
+      list:
+        - name: tenant_id
+          type: query
+          query: |
+            from(bucket: "${INFLUXDB_BUCKET}")
+              |> range(start: -30d)
+              |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
+              |> group(columns: ["tenant_id"])
+              |> distinct(column: "tenant_id")
+              |> yield(name: "tenant_ids")

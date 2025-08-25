@@ -1,0 +1,27 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB-Provider-CrossTenant
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    secureJsonData:
+      token: ${INFLUXDB_PROVIDER_CROSS_TENANT_TOKEN}
+    jsonData:
+      version: Flux
+      organization: ${INFLUXDB_ORG}
+      defaultBucket: ${INFLUXDB_BUCKET}
+      tlsSkipVerify: true
+      httpMethod: POST
+      queryTimeout: 120s
+      maxSeries: 50000
+      defaultQuery: |
+        // Provider cross-tenant query template
+        from(bucket: "${INFLUXDB_BUCKET}")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
+          |> group(columns: ["tenant_id", "service_name", "metric_type"])
+          |> mean()
+          |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+    editable: true
+    isDefault: false

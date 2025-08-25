@@ -1,0 +1,246 @@
+# Multi-Tenant Configuration for Bhashini QoS Monitoring
+# Defines customer organizations, access levels, and data isolation rules
+
+tenant_config:
+  version: "1.0"
+  created: "2024-01-01"
+  description: "Multi-tenant configuration for Bhashini QoS monitoring system"
+
+# Provider Organization Configuration
+provider_organization:
+  name: "Bhashini-Provider"
+  description: "Main provider organization with cross-tenant access"
+  org_id: 1
+  access_level: "admin"
+  capabilities:
+    - cross_tenant_data_access
+    - system_monitoring
+    - user_management
+    - dashboard_administration
+  data_sources:
+    - name: "InfluxDB-Provider-CrossTenant"
+      type: "influxdb"
+      access: "full"
+      description: "Provider access to all tenant data for analytics"
+  users:
+    - email: "provider.admin@bhashini.com"
+      role: "Admin"
+      permissions: ["all"]
+    - email: "provider.analyst@bhashini.com"
+      role: "Editor"
+      permissions: ["read", "write", "dashboard_edit"]
+
+# Customer Organizations Configuration
+customer_organizations:
+  - name: "Customer-1"
+    description: "Enterprise Customer 1 - Premium SLA"
+    org_id: 2
+    tenant_id: "enterprise_1"
+    sla_tier: "premium"
+    access_level: "restricted"
+    data_isolation:
+      method: "tag_based"
+      tags:
+        tenant_id: "enterprise_1"
+        sla_tier: "premium"
+    capabilities:
+      - tenant_specific_data_access
+      - dashboard_viewing
+      - limited_analytics
+    data_sources:
+      - name: "InfluxDB-Customer-Tenant"
+        type: "influxdb"
+        access: "read_only"
+        filters:
+          tenant_id: "enterprise_1"
+    users:
+      - email: "customer1.admin@example.com"
+        role: "Admin"
+        permissions: ["org_admin", "dashboard_edit"]
+      - email: "customer1.viewer@example.com"
+        role: "Viewer"
+        permissions: ["dashboard_view"]
+    quotas:
+      max_dashboards: 50
+      max_users: 10
+      data_retention_days: 90
+
+  - name: "Customer-2"
+    description: "Startup Customer 2 - Standard SLA"
+    org_id: 3
+    tenant_id: "startup_2"
+    sla_tier: "standard"
+    access_level: "restricted"
+    data_isolation:
+      method: "tag_based"
+      tags:
+        tenant_id: "startup_2"
+        sla_tier: "standard"
+    capabilities:
+      - tenant_specific_data_access
+      - dashboard_viewing
+      - basic_analytics
+    data_sources:
+      - name: "InfluxDB-Customer-Tenant"
+        type: "influxdb"
+        access: "read_only"
+        filters:
+          tenant_id: "startup_2"
+    users:
+      - email: "customer2.admin@example.com"
+        role: "Admin"
+        permissions: ["org_admin", "dashboard_edit"]
+      - email: "customer2.viewer@example.com"
+        role: "Viewer"
+        permissions: ["dashboard_view"]
+    quotas:
+      max_dashboards: 25
+      max_users: 5
+      data_retention_days: 60
+
+  - name: "Customer-3"
+    description: "Freemium Customer 3 - Basic SLA"
+    org_id: 4
+    tenant_id: "freemium_1"
+    sla_tier: "basic"
+    access_level: "restricted"
+    data_isolation:
+      method: "tag_based"
+      tags:
+        tenant_id: "freemium_1"
+        sla_tier: "basic"
+    capabilities:
+      - tenant_specific_data_access
+      - dashboard_viewing
+    data_sources:
+      - name: "InfluxDB-Customer-Tenant"
+        type: "influxdb"
+        access: "read_only"
+        filters:
+          tenant_id: "freemium_1"
+    users:
+      - email: "customer3.admin@example.com"
+        role: "Admin"
+        permissions: ["org_admin", "dashboard_edit"]
+      - email: "customer3.viewer@example.com"
+        role: "Viewer"
+        permissions: ["dashboard_view"]
+    quotas:
+      max_dashboards: 10
+      max_users: 3
+      data_retention_days: 30
+
+# Data Isolation Configuration
+data_isolation:
+  method: "tag_based"
+  primary_tag: "tenant_id"
+  additional_tags:
+    - "sla_tier"
+    - "service_name"
+    - "metric_type"
+  query_templates:
+    customer_query: |
+      from(bucket: "${bucket}")
+        |> range(start: -${time_range})
+        |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
+        |> filter(fn: (r) => r["tenant_id"] == "${tenant_id}")
+        |> group(columns: ["service_name", "metric_type"])
+        |> mean()
+    provider_query: |
+      from(bucket: "${bucket}")
+        |> range(start: -${time_range})
+        |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
+        |> group(columns: ["tenant_id", "service_name", "metric_type"])
+        |> mean()
+
+# Authentication Configuration
+authentication:
+  methods:
+    - basic_auth
+    - api_keys
+  api_key_expiry_days: 90
+  session_timeout_seconds: 86400
+  password_policy:
+    min_length: 8
+    require_special_chars: true
+    require_numbers: true
+    require_uppercase: true
+
+# Role-Based Access Control (RBAC)
+rbac:
+  roles:
+    Admin:
+      permissions:
+        - org_admin
+        - user_management
+        - dashboard_edit
+        - data_source_edit
+        - api_key_management
+    Editor:
+      permissions:
+        - dashboard_edit
+        - dashboard_view
+        - data_source_view
+    Viewer:
+      permissions:
+        - dashboard_view
+        - data_source_view
+
+# Monitoring and Alerting
+monitoring:
+  enabled: true
+  metrics:
+    - user_login_attempts
+    - api_key_usage
+    - data_access_patterns
+    - organization_activity
+  alerts:
+    - name: "Failed Login Attempts"
+      threshold: 5
+      time_window: "5m"
+    - name: "API Key Expiry Warning"
+      threshold: 7
+      time_window: "1d"
+
+# Scaling Configuration
+scaling:
+  max_organizations: 100
+  max_users_per_org: 50
+  max_dashboards_per_org: 100
+  max_data_sources_per_org: 10
+  auto_provisioning: false
+
+# Template for New Customers
+new_customer_template:
+  name: "Customer-{N}"
+  description: "New Customer {N} - {SLA_TIER} SLA"
+  org_id: "{NEXT_ID}"
+  tenant_id: "customer_{N}"
+  sla_tier: "standard"
+  access_level: "restricted"
+  data_isolation:
+    method: "tag_based"
+    tags:
+      tenant_id: "customer_{N}"
+      sla_tier: "{SLA_TIER}"
+  capabilities:
+    - tenant_specific_data_access
+    - dashboard_viewing
+    - basic_analytics
+  data_sources:
+    - name: "InfluxDB-Customer-Tenant"
+      type: "influxdb"
+      access: "read_only"
+      filters:
+        tenant_id: "customer_{N}"
+  users:
+    - email: "customer{N}.admin@example.com"
+      role: "Admin"
+      permissions: ["org_admin", "dashboard_edit"]
+    - email: "customer{N}.viewer@example.com"
+      role: "Viewer"
+      permissions: ["dashboard_view"]
+  quotas:
+    max_dashboards: 25
+    max_users: 5
+    data_retention_days: 60
