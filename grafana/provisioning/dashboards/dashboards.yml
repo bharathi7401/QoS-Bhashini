@@ -11,3 +11,16 @@ providers:
     options:
       path: /etc/grafana/provisioning/dashboards/provider-dashboards
       foldersFromFilesStructure: true
+
+  # Customer dashboards are provisioned via API by provision-customer-dashboards.py
+  # This prevents duplicate provisioning and allows dynamic tenant management
+  # - name: 'customer-dashboards'
+  #   orgId: 1
+  #   folder: 'Customer Dashboards'
+  #   type: file
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 30
+  #   allowUiUpdates: true
+  #   options:
+  #     path: /etc/grafana/provisioning/dashboards/customer-dashboards
+  #     foldersFromFilesStructure: true

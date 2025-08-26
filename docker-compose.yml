@@ -11,8 +11,8 @@ services:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=your_secure_admin_password
-      - DOCKER_INFLUXDB_INIT_ORG_NAME=bhashini
-      - DOCKER_INFLUXDB_INIT_BUCKET_NAME=qos_metrics
+      - DOCKER_INFLUXDB_INIT_ORG=bhashini
+      - DOCKER_INFLUXDB_INIT_BUCKET=qos_metrics
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=your_admin_token_here
     volumes:
       - influxdb_data:/var/lib/influxdb2
@@ -21,7 +21,7 @@ services:
     networks:
       - bhashini-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      test: ["CMD", "influx", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -37,9 +37,12 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/provider-dashboards
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/provider-dashboards/bhashini-provider-overview.json
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=5s
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_UID=bhashini-provider-overview
+      - INFLUXDB_PROVIDER_CROSS_TENANT_TOKEN=${INFLUXDB_PROVIDER_CROSS_TENANT_TOKEN}
+      - INFLUXDB_ORG=bhashini
+      - INFLUXDB_BUCKET=qos_metrics
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -76,8 +79,8 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./config:/app/config
-      - ./secrets/influxdb_tokens.env
-      - .env
+      - ./secrets:/secrets
+      - ./.env:/app/.env
     networks:
       - bhashini-network
     depends_on:

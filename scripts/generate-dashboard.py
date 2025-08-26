@@ -17,26 +17,94 @@ class DashboardGenerator:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Dashboard configuration
+        # Dashboard configuration - removed wrapper structure
         self.dashboard_config = {
-            "dashboard": {
-                "id": None,
-                "title": "Bhashini Provider Overview",
-                "tags": ["bhashini", "provider", "qos", "monitoring"],
-                "style": "dark",
-                "timezone": "browser",
-                "panels": [],
-                "templating": {"list": []},
-                "time": {"from": "now-6h", "to": "now"},
-                "timepicker": {},
-                "timezone": "",
-                "uid": "bhashini-provider-overview",
-                "version": 1
-            }
+            "id": None,
+            "title": "Bhashini Provider Overview",
+            "tags": ["bhashini", "provider", "qos", "monitoring"],
+            "style": "dark",
+            "timezone": "browser",
+            "panels": [],
+            "templating": {"list": []},
+            "time": {"from": "now-6h", "to": "now"},
+            "timepicker": {},
+            "timezone": "",
+            "uid": "bhashini-provider-overview",
+            "version": 1
         }
         
         # Panel counter
         self.panel_id = 1
+        
+        # Load Flux queries from template file
+        self.flux_queries = self.load_flux_queries()
+        
+    def load_flux_queries(self) -> Dict[str, str]:
+        """Load Flux queries from the provider-queries.flux file."""
+        queries = {}
+        queries_file = Path("scripts/dashboard-queries/provider-queries.flux")
+        
+        if not queries_file.exists():
+            print(f"Warning: Flux queries file not found: {queries_file}")
+            return queries
+        
+        try:
+            with open(queries_file, 'r') as f:
+                content = f.read()
+            
+            # Split content into sections and extract function definitions
+            sections = content.split('// =============================================================================')
+            
+            for section in sections:
+                if not section.strip():
+                    continue
+                    
+                lines = section.split('\n')
+                current_function = None
+                current_query = []
+                
+                for line in lines:
+                    line = line.strip()
+                    
+                    # Skip comments and empty lines
+                    if line.startswith('//') or not line:
+                        continue
+                    
+                    # Check for function definition
+                    if '=' in line and '=>' in line:
+                        # Save previous function if exists
+                        if current_function and current_query:
+                            queries[current_function] = '\n  '.join(current_query)
+                        
+                        # Start new function
+                        func_name = line.split('=')[0].strip()
+                        current_function = func_name
+                        current_query = []
+                    elif current_function and line:
+                        # Add line to current query
+                        current_query.append(line)
+                
+                # Save last function in section
+                if current_function and current_query:
+                    queries[current_function] = '\n  '.join(current_query)
+                
+            print(f"Loaded {len(queries)} Flux query templates: {list(queries.keys())}")
+            
+        except Exception as e:
+            print(f"Error loading Flux queries: {e}")
+            
+        return queries
+    
+    def get_flux_query(self, query_name: str, fallback: str = "") -> str:
+        """Get a Flux query by name from the loaded templates."""
+        if query_name in self.flux_queries:
+            return self.flux_queries[query_name]
+        elif fallback:
+            print(f"Warning: Query template '{query_name}' not found, using fallback")
+            return fallback
+        else:
+            print(f"Error: Query template '{query_name}' not found and no fallback provided")
+            return ""
         
     def create_stat_panel(self, title: str, query: str, unit: str = "none", 
                           thresholds: Optional[Dict] = None, position: Dict[str, int] = None) -> Dict[str, Any]:
@@ -223,10 +291,15 @@ class DashboardGenerator:
         """Generate header section panels."""
         panels = []
         
-        # System Status
+        # System Status - using template query
+        system_availability_query = self.get_flux_query(
+            "system_availability",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> group(columns: [\"tenant_id\", \"service_name\"])\n  |> mean()\n  |> group()\n  |> min()\n  |> yield(name: \"min_availability\")"
+        )
+        
         panels.append(self.create_stat_panel(
             title="System Status",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"tenant_id\", \"service_name\"])\n  |> mean()\n  |> group()\n  |> min()\n  |> yield(name: \"min_availability\")",
+            query=system_availability_query,
             unit="percent",
             thresholds={
                 "steps": [
@@ -238,26 +311,36 @@ class DashboardGenerator:
             position={"h": 8, "w": 6, "x": 0, "y": 0}
         ))
         
-        # Total API Calls
+        # Total API Calls - using template query
+        total_api_calls_query = self.get_flux_query(
+            "total_api_calls",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> group()\n  |> sum()\n  |> yield(name: \"total_calls\")"
+        )
+        
         panels.append(self.create_stat_panel(
             title="Total API Calls",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group()\n  |> sum()\n  |> yield(name: \"total_calls\")",
+            query=total_api_calls_query,
             unit="short",
             position={"h": 8, "w": 6, "x": 6, "y": 0}
         ))
         
-        # Active Tenants
+        # Active Tenants - fixed query
         panels.append(self.create_stat_panel(
             title="Active Tenants",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> group(columns: [\"tenant_id\"])\n  |> count()\n  |> yield(name: \"active_tenants\")",
+            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> distinct(column: \"tenant_id\")\n  |> count()\n  |> yield(name: \"active_tenants\")",
             unit="none",
             position={"h": 8, "w": 6, "x": 12, "y": 0}
         ))
         
-        # System Health Score
+        # System Health Score - using template query
+        system_health_query = self.get_flux_query(
+            "system_availability",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> group()\n  |> mean()\n  |> yield(name: \"health_score\")"
+        )
+        
         panels.append(self.create_stat_panel(
             title="System Health Score",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group()\n  |> mean()\n  |> yield(name: \"health_score\")",
+            query=system_health_query,
             unit="percent",
             thresholds={
                 "steps": [
@@ -275,16 +358,61 @@ class DashboardGenerator:
         """Generate performance overview panels."""
         panels = []
         
-        # Service Latency Trends
+        # Average Response Time - using template query
+        avg_response_query = self.get_flux_query(
+            "weighted_avg_latency",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group()\n  |> mean()\n  |> yield(name: \"avg_response_time\")"
+        )
+        
+        panels.append(self.create_stat_panel(
+            title="Average Response Time",
+            query=avg_response_query,
+            unit="ms",
+            thresholds={
+                "steps": [
+                    {"color": "green", "value": None},
+                    {"color": "yellow", "value": 100},
+                    {"color": "red", "value": 200}
+                ]
+            },
+            position={"h": 8, "w": 6, "x": 0, "y": 8}
+        ))
+        
+        # Overall Error Rate - using template query
+        overall_error_query = self.get_flux_query(
+            "overall_error_rate",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group()\n  |> mean()\n  |> yield(name: \"overall_error_rate\")"
+        )
+        
+        panels.append(self.create_stat_panel(
+            title="Overall Error Rate",
+            query=overall_error_query,
+            unit="percent",
+            thresholds={
+                "steps": [
+                    {"color": "green", "value": None},
+                    {"color": "yellow", "value": 1},
+                    {"color": "red", "value": 5}
+                ]
+            },
+            position={"h": 8, "w": 6, "x": 6, "y": 8}
+        ))
+        
+        # Service Latency Trends with P50, P95, P99
         latency_targets = [
             {
                 "refId": "A",
-                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")",
+                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.50)\n  |> yield(name: \"p50\")",
                 "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
             },
             {
                 "refId": "B",
-                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.95)\n  |> yield(name: \"p95\")",
+                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.95)\n  |> yield(name: \"p95\")",
+                "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
+            },
+            {
+                "refId": "C",
+                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.99)\n  |> yield(name: \"p99\")",
                 "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
             }
         ]
@@ -292,20 +420,7 @@ class DashboardGenerator:
         panels.append(self.create_timeseries_panel(
             title="Service Latency Trends",
             targets=latency_targets,
-            position={"h": 8, "w": 12, "x": 0, "y": 8}
-        ))
-        
-        # Error Rate Trends
-        error_targets = [{
-            "refId": "A",
-            "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> filter(fn: (r) => contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"error_rate\")",
-            "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
-        }]
-        
-        panels.append(self.create_timeseries_panel(
-            title="Error Rate Trends",
-            targets=error_targets,
-            position={"h": 8, "w": 12, "x": 12, "y": 8}
+            position={"h": 8, "w": 12, "x": 0, "y": 16}
         ))
         
         return panels
@@ -314,17 +429,27 @@ class DashboardGenerator:
         """Generate capacity planning panels."""
         panels = []
         
-        # Capacity Utilization
+        # Capacity Utilization - using template query
+        capacity_query = self.get_flux_query(
+            "capacity_utilization",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group()\n  |> sum()\n  |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\n  |> yield(name: \"capacity_utilization\")"
+        )
+        
         panels.append(self.create_gauge_panel(
             title="Capacity Utilization",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group()\n  |> sum()\n  |> map(fn: (r) => ({r with _value: r._value / 1000.0}))\n  |> yield(name: \"capacity_utilization\")",
-            position={"h": 8, "w": 6, "x": 0, "y": 24}
+            query=capacity_query,
+            position={"h": 8, "w": 6, "x": 0, "y": 40}
         ))
         
-        # SLA Compliance
+        # SLA Compliance - using template query
+        sla_compliance_query = self.get_flux_query(
+            "sla_compliance_tracking",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"tenant_id\", \"service_name\", \"sla_tier\"])\n  |> mean()\n  |> filter(fn: (r) => r._value >= 99.0)\n  |> count()\n  |> yield(name: \"sla_compliant\")"
+        )
+        
         panels.append(self.create_stat_panel(
             title="SLA Compliance",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"tenant_id\", \"service_name\", \"sla_tier\"])\n  |> mean()\n  |> filter(fn: (r) => r._value >= 99.0)\n  |> count()\n  |> yield(name: \"sla_compliant\")",
+            query=sla_compliance_query,
             unit="none",
             thresholds={
                 "steps": [
@@ -332,7 +457,7 @@ class DashboardGenerator:
                     {"color": "green", "value": 1}
                 ]
             },
-            position={"h": 8, "w": 6, "x": 6, "y": 24}
+            position={"h": 8, "w": 6, "x": 6, "y": 40}
         ))
         
         return panels
@@ -340,41 +465,87 @@ class DashboardGenerator:
     def generate_dashboard(self) -> Dict[str, Any]:
         """Generate the complete dashboard configuration."""
         # Add all panels
-        self.dashboard_config["dashboard"]["panels"].extend(self.generate_header_panels())
-        self.dashboard_config["dashboard"]["panels"].extend(self.generate_performance_panels())
+        self.dashboard_config["panels"].extend(self.generate_header_panels())
+        self.dashboard_config["panels"].extend(self.generate_performance_panels())
         
         # Add throughput and availability panels
-        self.dashboard_config["dashboard"]["panels"].append(self.create_timeseries_panel(
+        throughput_query = self.get_flux_query(
+            "service_throughput_patterns",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: sum, createEmpty: false)\n  |> yield(name: \"throughput\")"
+        )
+        
+        self.dashboard_config["panels"].append(self.create_timeseries_panel(
             title="Throughput Patterns",
             targets=[{
                 "refId": "A",
-                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: sum, createEmpty: false)\n  |> yield(name: \"throughput\")",
+                "query": throughput_query,
                 "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
             }],
-            position={"h": 8, "w": 12, "x": 0, "y": 16}
+            position={"h": 8, "w": 12, "x": 0, "y": 24}
         ))
         
-        self.dashboard_config["dashboard"]["panels"].append(self.create_heatmap_panel(
+        availability_query = self.get_flux_query(
+            "service_availability_tracking",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\", \"sla_tier\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"availability\")"
+        )
+        
+        self.dashboard_config["panels"].append(self.create_heatmap_panel(
             title="Availability Heatmap",
-            query="from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> group(columns: [\"service_name\", \"sla_tier\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"availability\")",
-            position={"h": 8, "w": 12, "x": 12, "y": 16}
-        ))
-        
-        self.dashboard_config["dashboard"]["panels"].extend(self.generate_capacity_panels())
-        
-        # Add traffic growth trends
-        self.dashboard_config["dashboard"]["panels"].append(self.create_timeseries_panel(
-            title="Traffic Growth Trends",
-            targets=[{
-                "refId": "A",
-                "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n  |> yield(name: \"hourly_traffic\")",
-                "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
-            }],
+            query=availability_query,
             position={"h": 8, "w": 12, "x": 12, "y": 24}
         ))
         
+        self.dashboard_config["panels"].extend(self.generate_capacity_panels())
+        
+        # Add traffic growth trends
+        traffic_growth_query = self.get_flux_query(
+            "traffic_growth_rate",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n  |> yield(name: \"hourly_traffic\")"
+        )
+        
+        self.dashboard_config["panels"].append(self.create_timeseries_panel(
+            title="Traffic Growth Trends",
+            targets=[{
+                "refId": "A",
+                "query": traffic_growth_query,
+                "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
+            }],
+            position={"h": 8, "w": 12, "x": 12, "y": 40}
+        ))
+        
+        # Add capacity planning panels
+        peak_traffic_query = self.get_flux_query(
+            "peak_traffic_analysis",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 15m, fn: sum, createEmpty: false)\n  |> group()\n  |> max()\n  |> yield(name: \"peak_traffic\")"
+        )
+        
+        self.dashboard_config["panels"].append(self.create_timeseries_panel(
+            title="Peak Traffic Analysis",
+            targets=[{
+                "refId": "A",
+                "query": peak_traffic_query,
+                "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
+            }],
+            position={"h": 8, "w": 12, "x": 0, "y": 48}
+        ))
+        
+        resource_allocation_query = self.get_flux_query(
+            "resource_allocation_by_service",
+            "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> sum()\n  |> yield(name: \"service_allocation\")"
+        )
+        
+        self.dashboard_config["panels"].append(self.create_timeseries_panel(
+            title="Resource Allocation by Service",
+            targets=[{
+                "refId": "A",
+                "query": resource_allocation_query,
+                "datasource": {"type": "influxdb", "uid": "InfluxDB-Provider-CrossTenant"}
+            }],
+            position={"h": 8, "w": 12, "x": 12, "y": 48}
+        ))
+        
         # Add template variables
-        self.dashboard_config["dashboard"]["templating"]["list"] = self.create_template_variables()
+        self.dashboard_config["templating"]["list"] = self.create_template_variables()
         
         return self.dashboard_config
     
@@ -393,19 +564,19 @@ class DashboardGenerator:
         try:
             dashboard = self.generate_dashboard()
             
-            # Basic validation
-            required_keys = ["dashboard", "panels", "templating"]
+            # Basic validation - removed dashboard wrapper check
+            required_keys = ["title", "panels", "templating", "uid"]
             for key in required_keys:
-                if key not in dashboard["dashboard"]:
+                if key not in dashboard:
                     print(f"Missing required key: {key}")
                     return False
             
             # Panel validation
-            if not dashboard["dashboard"]["panels"]:
+            if not dashboard["panels"]:
                 print("No panels generated")
                 return False
             
-            print(f"Dashboard validation successful. Generated {len(dashboard['dashboard']['panels'])} panels.")
+            print(f"Dashboard validation successful. Generated {len(dashboard['panels'])} panels.")
             return True
             
         except Exception as e:

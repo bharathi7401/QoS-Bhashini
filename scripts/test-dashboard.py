@@ -116,21 +116,15 @@ class DashboardTester:
             with open(dashboard_file, 'r') as f:
                 dashboard_data = json.load(f)
             
-            # Validate required structure
-            required_keys = ["dashboard"]
+            # Validate required structure - removed dashboard wrapper check
+            required_keys = ["title", "panels", "templating", "uid"]
             for key in required_keys:
                 if key not in dashboard_data:
                     print(f"✗ Dashboard JSON missing required key: {key}")
                     self.test_results["dashboard_structure"] = False
                     return False
             
-            dashboard = dashboard_data["dashboard"]
-            required_dashboard_keys = ["title", "panels", "templating", "uid"]
-            for key in required_dashboard_keys:
-                if key not in dashboard:
-                    print(f"✗ Dashboard missing required key: {key}")
-                    self.test_results["dashboard_structure"] = False
-                    return False
+            dashboard = dashboard_data
             
             # Validate panels
             if not dashboard["panels"]:
@@ -214,7 +208,7 @@ class DashboardTester:
                 return True
             else:
                 print(f"✗ Docker services test failed: Only {running_services} running")
-                self.test_results["docker_services"] = True
+                self.test_results["docker_services"] = False
                 return False
                 
         except subprocess.TimeoutExpired:

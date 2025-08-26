@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB-QoS-Metrics
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    secureJsonData:
+      token: 
+    jsonData:
+      version: Flux
+      organization: bhashini
+      defaultBucket: qos_metrics
+      tlsSkipVerify: true
+      httpMethod: POST
+      queryTimeout: 60s
+      maxSeries: 10000

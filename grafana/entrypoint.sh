@@ -14,7 +14,8 @@ fi
 # Pre-render datasource configuration
 if [ -f /etc/grafana/provisioning/datasources/influxdb.yml.template ]; then
     echo "📝 Rendering datasource template..."
-    envsubst < /etc/grafana/provisioning/datasources/influxdb.yml.template > /etc/grafana/provisioning/datasources/influxdb.yml
+    sed "s/\${INFLUXDB_GRAFANA_TOKEN}/$INFLUXDB_GRAFANA_TOKEN/g; s/\${INFLUXDB_ORG}/$INFLUXDB_ORG/g; s/\${INFLUXDB_BUCKET}/$INFLUXDB_BUCKET/g" \
+        /etc/grafana/provisioning/datasources/influxdb.yml.template > /etc/grafana/provisioning/datasources/influxdb.yml
     echo "✅ Datasource configuration rendered successfully"
 else
     echo "⚠️  Datasource template not found, using default configuration"

@@ -2,29 +2,57 @@
 # Core dependencies for dashboard generation and testing
 
 # JSON manipulation and validation
-jsonschema>=4.0.0
+jsonschema==4.20.0
 
 # Dashboard generation and templating
-jinja2>=3.0.0
+jinja2==3.1.2
+
+# YAML configuration processing
+pyyaml==6.0.1
+
+# Configuration management
+python-dotenv==1.0.0
 
 # Testing frameworks
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
 
 # Data analysis and metrics calculation
-pandas>=1.5.0
-numpy>=1.24.0
+pandas==2.1.4
+numpy==1.24.4
 
 # HTTP requests for API testing
-requests>=2.28.0
+requests==2.31.0
+requests-mock==1.11.0
 
-# Grafana API client (if needed)
-grafana-api>=1.0.0
+# Grafana API client
+grafana-api==1.0.3
+
+# InfluxDB client with advanced query capabilities
+influxdb-client==1.38.0
 
 # Visualization libraries for dashboard testing
-matplotlib>=3.6.0
-seaborn>=0.12.0
+matplotlib==3.8.2
+seaborn==0.13.0
 
 # Development and debugging
-ipython>=8.0.0
-jupyter>=1.0.0
+ipython==8.18.1
+jupyter==1.0.0
+
+# Security and authentication
+cryptography==41.0.8
+PyJWT==2.8.0
+bcrypt==4.1.2
+
+# Utility libraries
+click==8.1.7
+colorama==0.4.6
+tqdm==4.66.1
+tabulate==0.9.0
+
+# Data comparison and validation
+deepdiff==6.7.1
+
+# Test coverage
+coverage==7.3.2
