@@ -4,12 +4,10 @@ Bhashini QoS Data Simulator
 Generates realistic QoS metrics for Bhashini Translation, TTS, and ASR services
 """
 
-import os
 import sys
 import time
 import signal
 import logging
-import schedule
 from datetime import datetime
 from threading import Thread
 from flask import Flask, jsonify
@@ -24,9 +22,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class BhashiniQoSSimulator:
     """Main simulator class for generating Bhashini QoS metrics"""
-    
+
     def __init__(self):
         self.config = Config()
         self.metrics_generator = MetricsGenerator()
@@ -34,18 +33,19 @@ class BhashiniQoSSimulator:
         self.running = False
         self.metrics_count = 0
         self.start_time = datetime.now()
-        
+        self.last_generation = None
+
         # Setup Flask app for health checks
         self.app = Flask(__name__)
         self.setup_routes()
-        
+
     def setup_routes(self):
         """Setup Flask routes for health checks and monitoring"""
         @self.app.route('/health')
         def health():
             """Health check endpoint"""
             influxdb_connected = self.influx_client.is_healthy() if hasattr(self, 'influx_client') else False
-            
+
             return jsonify({
                 'status': 'healthy',
                 'timestamp': datetime.now().isoformat(),
@@ -58,7 +58,7 @@ class BhashiniQoSSimulator:
                 'last_generation': self.last_generation,
                 'simulation_running': self.running
             })
-            
+
         @self.app.route('/status')
         def status():
             return jsonify({
@@ -72,101 +72,108 @@ class BhashiniQoSSimulator:
                     'tenants_count': len(self.config.TENANTS)
                 }
             })
-            
+
     def connect_to_influxdb(self):
         """Establish connection to InfluxDB with retry logic"""
         max_retries = 5
         retry_delay = 5
-        
+
         for attempt in range(max_retries):
             logger.info(f"Attempting to connect to InfluxDB (attempt {attempt + 1}/{max_retries})")
-            
+
             if self.influx_client.connect():
                 logger.info("Successfully connected to InfluxDB")
                 return True
-                
+
             if attempt < max_retries - 1:
                 logger.warning(f"Connection failed, retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
                 retry_delay *= 2  # Exponential backoff
-                
+
         logger.error("Failed to connect to InfluxDB after all retry attempts")
         return False
-        
+
     def generate_and_write_metrics(self):
         """Generate metrics and write them to InfluxDB"""
         try:
             # Generate metrics batch
             metrics_batch = self.metrics_generator.generate_metrics_batch()
-            
+
             if not metrics_batch:
                 logger.warning("No metrics generated in this batch")
                 return
-                
+
             # Write to InfluxDB
             if self.influx_client.write_metrics_batch(metrics_batch):
                 self.metrics_count += len(metrics_batch)
                 self.last_generation = datetime.now().isoformat()
-                
+
                 # Log summary
                 summary = self.metrics_generator.get_metrics_summary()
                 logger.info(f"Generated {len(metrics_batch)} metrics for {summary['services_count']} services and {summary['tenants_count']} tenants")
-                
+
             else:
                 logger.error("Failed to write metrics batch to InfluxDB")
-                
+
         except Exception as e:
             logger.error(f"Error in generate_and_write_metrics: {str(e)}")
-            
+
     def run_simulation(self):
         """Run the main simulation loop"""
         logger.info("Starting Bhashini QoS Data Simulator")
-        
+
         # Start Flask health endpoint in daemon thread first
         Thread(target=self.run_flask, daemon=True).start()
         logger.info("Health endpoint started on port 8000")
-        
+
         # Connect to InfluxDB
         if not self.connect_to_influxdb():
             logger.error("Cannot start simulation without InfluxDB connection")
             return
-            
-        # Schedule metric generation
-        schedule.every(self.config.SIMULATION_INTERVAL).seconds.do(self.generate_and_write_metrics)
-        
+
         # Generate initial metrics
         logger.info("Generating initial metrics batch...")
         self.generate_and_write_metrics()
-        
+
         self.running = True
         logger.info(f"Simulation started with {self.config.SIMULATION_INTERVAL}s interval")
-        
+
         try:
             while self.running:
-                schedule.run_pending()
-                time.sleep(1)
-                
+                try:
+                    # Generate metrics at regular intervals
+                    self.generate_and_write_metrics()
+
+                    # Sleep for the configured interval
+                    time.sleep(self.config.SIMULATION_INTERVAL)
+
+                except Exception as e:
+                    logger.error(f"Unexpected error in simulation loop: {str(e)}")
+                    # Try to reconnect and continue
+                    if not self.connect_to_influxdb():
+                        logger.error("Failed to reconnect to InfluxDB, stopping simulation...")
+                        break
+
         except KeyboardInterrupt:
             logger.info("Received interrupt signal, shutting down...")
-        except Exception as e:
-            logger.error(f"Unexpected error in simulation loop: {str(e)}")
         finally:
             self.shutdown()
-            
+
     def shutdown(self):
         """Gracefully shutdown the simulator"""
         logger.info("Shutting down Bhashini QoS Data Simulator...")
         self.running = False
-        
+
         # Disconnect from InfluxDB
         self.influx_client.disconnect()
-        
+
         logger.info(f"Simulator shutdown complete. Total metrics generated: {self.metrics_count}")
-        
+
     def run_flask(self):
         """Run Flask app for health checks"""
         self.app.run(host='0.0.0.0', port=8000, debug=False)
-        
+
+
 def signal_handler(signum, frame):
     """Handle shutdown signals"""
     logger.info(f"Received signal {signum}, initiating shutdown...")
@@ -174,22 +181,24 @@ def signal_handler(signum, frame):
         signal_handler.simulator.shutdown()
     sys.exit(0)
 
+
 def main():
     """Main entry point"""
     # Create simulator instance
     simulator = BhashiniQoSSimulator()
     signal_handler.simulator = simulator
-    
+
     # Setup signal handlers
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    
+
     # Check if running in health check mode
     if len(sys.argv) > 1 and sys.argv[1] == '--health-check':
         simulator.run_flask()
     else:
         # Run simulation
         simulator.run_simulation()
+
 
 if __name__ == "__main__":
     main()

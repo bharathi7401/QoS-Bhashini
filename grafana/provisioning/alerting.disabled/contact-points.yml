@@ -1,0 +1,10 @@
+apiVersion: 1
+contactPoints:
+  - name: provider-ops-email
+    type: email
+    settings:
+      addresses: ${PROVIDER_EMAIL_LIST}
+  - name: provider-slack-alerts
+    type: slack
+    settings:
+      url: ${SLACK_WEBHOOK_URL}

@@ -1,0 +1,650 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Government Sector Dashboard - $tenant_name",
+    "tags": ["government", "citizen-services", "compliance", "operational-efficiency"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Citizen Service Efficiency Overview",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Average Service Completion Time",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(service_completion_time{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "{{service_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 30},
+                {"color": "red", "value": 60}
+              ]
+            },
+            "unit": "m",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 1}
+      },
+      {
+        "id": 3,
+        "title": "Citizen Satisfaction Score",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(citizen_satisfaction{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Overall Satisfaction"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3},
+                {"color": "green", "value": 4}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 1}
+      },
+      {
+        "id": 4,
+        "title": "Digital Service Adoption Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(digital_users{tenant_id=\"$tenant_id\"}) / sum(total_users{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Digital Adoption %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 1}
+      },
+      {
+        "id": 5,
+        "title": "Service Availability During Business Hours",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(availability{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Availability %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 98},
+                {"color": "green", "value": 99.5}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 2
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 1}
+      },
+      {
+        "id": 6,
+        "title": "Compliance Monitoring",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 9}
+      },
+      {
+        "id": 7,
+        "title": "Data Privacy Adherence",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(privacy_compliance_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Privacy Compliance"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 100}
+              ]
+            },
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 10}
+      },
+      {
+        "id": 8,
+        "title": "Accessibility Standards Compliance",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(accessibility_compliance_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Accessibility Compliance"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 90},
+                {"color": "green", "value": 100}
+              ]
+            },
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 10}
+      },
+      {
+        "id": 9,
+        "title": "Regulatory Requirement Tracking",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(met_requirements{tenant_id=\"$tenant_id\"}) / sum(total_requirements{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Requirements Met %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 100}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 10}
+      },
+      {
+        "id": 10,
+        "title": "Operational Efficiency",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 18}
+      },
+      {
+        "id": 11,
+        "title": "Cost Per Transaction",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(transaction_cost{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Cost per Transaction"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 2.00},
+                {"color": "red", "value": 5.00}
+              ]
+            },
+            "unit": "currencyUSD",
+            "decimals": 2
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 19}
+      },
+      {
+        "id": 12,
+        "title": "Service Availability",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(availability{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Overall Availability"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 98},
+                {"color": "green", "value": 99.5}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 2
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 19}
+      },
+      {
+        "id": 13,
+        "title": "Resource Utilization",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(cpu_usage{tenant_id=\"$tenant_id\"} + memory_usage{tenant_id=\"$tenant_id\"}) / 2",
+            "legendFormat": "Resource Utilization"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "red", "value": 90}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 19}
+      },
+      {
+        "id": 14,
+        "title": "Language Coverage",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27}
+      },
+      {
+        "id": 15,
+        "title": "Regional Language Coverage",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(distinct(language{tenant_id=\"$tenant_id\"}))",
+            "legendFormat": "Languages Supported"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "green", "value": 10}
+              ]
+            },
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 28}
+      },
+      {
+        "id": 16,
+        "title": "Citizen Demographics Served",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(served_population{tenant_id=\"$tenant_id\"}) / sum(total_population{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Population Coverage %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 28}
+      },
+      {
+        "id": 17,
+        "title": "Emergency Response",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 36}
+      },
+      {
+        "id": 18,
+        "title": "Emergency Alert Delivery Success",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(successful_deliveries{tenant_id=\"$tenant_id\"}) / sum(total_alerts{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Alert Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 100}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 37}
+      },
+      {
+        "id": 19,
+        "title": "Response Time for Critical Communications",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(emergency_response_time{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Emergency Response Time"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 30},
+                {"color": "red", "value": 60}
+              ]
+            },
+            "unit": "s",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 37}
+      },
+      {
+        "id": 20,
+        "title": "Common Metrics",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 45}
+      },
+      {
+        "id": 21,
+        "title": "Service Availability Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(availability{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Availability %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 98},
+                {"color": "green", "value": 99.5}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 2
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 46}
+      },
+      {
+        "id": 22,
+        "title": "Response Time Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(response_time{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Response Time (ms)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 2000},
+                {"color": "red", "value": 5000}
+              ]
+            },
+            "unit": "ms",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 46}
+      },
+      {
+        "id": 23,
+        "title": "Error Rate Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(error_rate{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Error Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.01},
+                {"color": "red", "value": 0.03}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 3
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 55}
+      },
+      {
+        "id": 24,
+        "title": "Throughput Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(throughput{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Throughput (req/s)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "reqps",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 55}
+      }
+    ],
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "tenant_id",
+          "type": "query",
+          "query": "tenant_id",
+          "current": {
+            "value": "$tenant_id",
+            "text": "$tenant_id"
+          },
+          "options": []
+        },
+        {
+          "name": "tenant_name",
+          "type": "query",
+          "query": "tenant_name",
+          "current": {
+            "value": "$tenant_name",
+            "text": "$tenant_name"
+          },
+          "options": []
+        },
+        {
+          "name": "department",
+          "type": "custom",
+          "query": "All,Administration,Health,Education,Transport,Finance,Public Safety",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "Administration", "text": "Administration"},
+            {"value": "Health", "text": "Health"},
+            {"value": "Education", "text": "Education"},
+            {"value": "Transport", "text": "Transport"},
+            {"value": "Finance", "text": "Finance"},
+            {"value": "Public Safety", "text": "Public Safety"}
+          ]
+        },
+        {
+          "name": "service_type",
+          "type": "custom",
+          "query": "All,Citizen Services,Emergency Response,Administrative,Public Communication",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "Citizen Services", "text": "Citizen Services"},
+            {"value": "Emergency Response", "text": "Emergency Response"},
+            {"value": "Administrative", "text": "Administrative"},
+            {"value": "Public Communication", "text": "Public Communication"}
+          ]
+        },
+        {
+          "name": "geographical_region",
+          "type": "custom",
+          "query": "All,North,South,East,West,Central",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "North", "text": "North"},
+            {"value": "South", "text": "South"},
+            {"value": "East", "text": "East"},
+            {"value": "West", "text": "West"},
+            {"value": "Central", "text": "Central"}
+          ]
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Government Sector Alerts",
+          "datasource": "InfluxDB",
+          "enable": true,
+          "expr": "government_alerts",
+          "iconColor": "red",
+          "tags": ["government", "alerts"]
+        }
+      ]
+    },
+    "refresh": "1m",
+    "schemaVersion": 30,
+    "version": 1,
+    "links": [],
+    "gnetId": null,
+    "uid": "government-dashboard-$tenant_id"
+  }
+}

@@ -1,0 +1,335 @@
+{
+  "id": null,
+  "title": "Startup 1 - QoS & SLA Dashboard",
+  "tags": ["tenant", "startup", "qos", "sla"],
+  "style": "dark",
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Overall Service Availability",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      tenant: \"Startup 1\",\n      metric: \"Availability\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
+            ]
+          },
+          "displayName": "Availability"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Average Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      tenant: \"Startup 1\",\n      metric: \"Response Time\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          },
+          "displayName": "Response Time"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Error Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      tenant: \"Startup 1\",\n      metric: \"Error Rate\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          },
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "id": 4,
+      "title": "Throughput",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group()\n  |> sum()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      tenant: \"Startup 1\",\n      metric: \"Throughput\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "mappings": [],
+          "unit": "requests_per_minute",
+          "displayName": "Throughput"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+    },
+    {
+      "id": 5,
+      "title": "SLA Compliance Status",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> filter(fn: (r) => r[\"value\"] >= 95.0)\n  |> group()\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      status: if r._value > 0 then \"Compliant\" else \"Non-Compliant\",\n      tenant: \"Startup 1\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "none",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          },
+          "displayName": "SLA Status"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8}
+    },
+    {
+      "id": 6,
+      "title": "Service Performance by SLA Tier",
+      "type": "piechart",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group(columns: [\"sla_tier\"])\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      sla_tier: r.sla_tier,\n      count: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "SLA Tier"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8}
+    },
+    {
+      "id": 7,
+      "title": "Service Availability Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      availability: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Availability"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    },
+    {
+      "id": 8,
+      "title": "Response Time by Service",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      response_time: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Response Time"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+    },
+    {
+      "id": 9,
+      "title": "Error Rate Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      error_rate: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          },
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+    },
+    {
+      "id": 10,
+      "title": "Throughput Performance",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: sum, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      throughput: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "requests_per_minute",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Throughput"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+    },
+    {
+      "id": 11,
+      "title": "SLA Violation Alerts",
+      "type": "table",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"tenant_id\"] == \"startup_1\")\n  |> filter(fn: (r) => (r[\"metric_type\"] == \"availability\" and r[\"value\"] < 95.0) or (r[\"metric_type\"] == \"latency\" and r[\"value\"] > 200) or (r[\"metric_type\"] == \"error_rate\" and r[\"value\"] > 5.0))\n  |> group(columns: [\"service_name\", \"metric_type\", \"sla_tier\"])\n  |> last()\n  |> sort(columns: [\"_time\"], desc: true)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      service: r.service_name,\n      metric_type: r.metric_type,\n      sla_tier: r.sla_tier,\n      value: r._value,\n      violation: if r[\"metric_type\"] == \"availability\" then \"Below 95%\" else if r[\"metric_type\"] == \"latency\" then \"Above 200ms\" else \"Above 5%\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Violation Details"
+        }
+      },
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+    }
+  ],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "version": 1,
+  "links": [],
+  "uid": "startup-1-tenant-dashboard"
+}

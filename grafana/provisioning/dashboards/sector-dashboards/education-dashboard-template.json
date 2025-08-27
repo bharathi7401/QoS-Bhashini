@@ -1,0 +1,693 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Education Sector Dashboard - $tenant_name",
+    "tags": ["education", "content-localization", "learning-accessibility", "student-engagement"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Content Localization",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Curriculum Translation Coverage",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(translated_subjects{tenant_id=\"$tenant_id\"}) / sum(total_subjects{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Translation Coverage"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 70},
+                {"color": "green", "value": 90}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 1}
+      },
+      {
+        "id": 3,
+        "title": "Educational Material Adaptation Success",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(adapted_materials{tenant_id=\"$tenant_id\"}) / sum(total_materials{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Adaptation Success"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 65},
+                {"color": "green", "value": 85}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 1}
+      },
+      {
+        "id": 4,
+        "title": "Multilingual Content Quality Score",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(content_quality_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Content Quality"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 1}
+      },
+      {
+        "id": 5,
+        "title": "Student Engagement",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 9}
+      },
+      {
+        "id": 6,
+        "title": "Learning Platform Usage Across Languages",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(active_language_users{tenant_id=\"$tenant_id\"}) / sum(total_users{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Multi-language Usage"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 60},
+                {"color": "green", "value": 80}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 10}
+      },
+      {
+        "id": 7,
+        "title": "Student Interaction Rate with Localized Content",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(interactions{tenant_id=\"$tenant_id\"}) / sum(total_content_views{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Interaction Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 55},
+                {"color": "green", "value": 75}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 10}
+      },
+      {
+        "id": 8,
+        "title": "Educational Outcome Improvements",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(learning_outcome_improvement{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Outcome Improvement"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "green", "value": 15}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 10}
+      },
+      {
+        "id": 9,
+        "title": "Accessibility",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 18}
+      },
+      {
+        "id": 10,
+        "title": "Special Needs Support Effectiveness",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(special_needs_support_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Special Needs Support"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 19}
+      },
+      {
+        "id": 11,
+        "title": "Inclusive Education Tool Usage",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(inclusive_tool_users{tenant_id=\"$tenant_id\"}) / sum(total_students{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Inclusive Tool Usage"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 65},
+                {"color": "green", "value": 85}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 19}
+      },
+      {
+        "id": 12,
+        "title": "Learning Barrier Reduction",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(barrier_reduction_percentage{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Barrier Reduction"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 10},
+                {"color": "green", "value": 20}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 19}
+      },
+      {
+        "id": 13,
+        "title": "Teacher Support",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27}
+      },
+      {
+        "id": 14,
+        "title": "Educator Efficiency with Multilingual Tools",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(educator_efficiency_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Educator Efficiency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 28}
+      },
+      {
+        "id": 15,
+        "title": "Content Creation Assistance Metrics",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(assisted_content_creation{tenant_id=\"$tenant_id\"}) / sum(total_content_creation{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Content Creation Assistance"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 60},
+                {"color": "green", "value": 80}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 28}
+      },
+      {
+        "id": 16,
+        "title": "Professional Development Impact",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(professional_development_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Professional Development"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 28}
+      },
+      {
+        "id": 17,
+        "title": "Institutional Metrics",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 36}
+      },
+      {
+        "id": 18,
+        "title": "School/University Adoption Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(adopted_institutions{tenant_id=\"$tenant_id\"}) / sum(total_institutions{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Institution Adoption"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 75}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 37}
+      },
+      {
+        "id": 19,
+        "title": "Educational Equity Improvements",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(equity_improvement_percentage{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Equity Improvement"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "green", "value": 15}
+              ]
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 37}
+      },
+      {
+        "id": 20,
+        "title": "System-wide Learning Outcome Trends",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "avg(system_learning_outcome_score{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "System Learning Outcomes"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 1,
+            "max": 5,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 1},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 37}
+      },
+      {
+        "id": 21,
+        "title": "Learning Impact Trends",
+        "type": "row",
+        "collapsed": false,
+        "panels": [],
+        "gridPos": {"h": 1, "w": 24, "x": 0, "y": 45}
+      },
+      {
+        "id": 22,
+        "title": "Content Localization Progress",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(translated_subjects{tenant_id=\"$tenant_id\"}) / sum(total_subjects{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Translation Coverage %"
+          },
+          {
+            "expr": "sum(adapted_materials{tenant_id=\"$tenant_id\"}) / sum(total_materials{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Material Adaptation %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 46}
+      },
+      {
+        "id": 23,
+        "title": "Student Engagement Trends",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(active_language_users{tenant_id=\"$tenant_id\"}) / sum(total_users{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Multi-language Usage %"
+          },
+          {
+            "expr": "sum(interactions{tenant_id=\"$tenant_id\"}) / sum(total_content_views{tenant_id=\"$tenant_id\"}) * 100",
+            "legendFormat": "Interaction Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 46}
+      },
+      {
+        "id": 24,
+        "title": "Learning Outcomes and Accessibility",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(learning_outcome_improvement{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Outcome Improvement %"
+          },
+          {
+            "expr": "avg(barrier_reduction_percentage{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Barrier Reduction %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "percent",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 55}
+      },
+      {
+        "id": 25,
+        "title": "System Performance Metrics",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(availability{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Availability %"
+          },
+          {
+            "expr": "avg(response_time{tenant_id=\"$tenant_id\"})",
+            "legendFormat": "Response Time (ms)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 55}
+      }
+    ],
+    "time": {
+      "from": "now-7d",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "tenant_id",
+          "type": "query",
+          "query": "tenant_id",
+          "current": {
+            "value": "$tenant_id",
+            "text": "$tenant_id"
+          },
+          "options": []
+        },
+        {
+          "name": "tenant_name",
+          "type": "query",
+          "query": "tenant_name",
+          "current": {
+            "value": "$tenant_name",
+            "text": "$tenant_name"
+          },
+          "options": []
+        },
+        {
+          "name": "educational_level",
+          "type": "custom",
+          "query": "All,Primary,Secondary,Higher Education,Professional Development",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "Primary", "text": "Primary"},
+            {"value": "Secondary", "text": "Secondary"},
+            {"value": "Higher Education", "text": "Higher Education"},
+            {"value": "Professional Development", "text": "Professional Development"}
+          ]
+        },
+        {
+          "name": "subject_area",
+          "type": "custom",
+          "query": "All,Mathematics,Science,Languages,Social Studies,Arts,Technology",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "Mathematics", "text": "Mathematics"},
+            {"value": "Science", "text": "Science"},
+            {"value": "Languages", "text": "Languages"},
+            {"value": "Social Studies", "text": "Social Studies"},
+            {"value": "Arts", "text": "Arts"},
+            {"value": "Technology", "text": "Technology"}
+          ]
+        },
+        {
+          "name": "geographical_region",
+          "type": "custom",
+          "query": "All,North,South,East,West,Central,Rural,Urban",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "North", "text": "North"},
+            {"value": "South", "text": "South"},
+            {"value": "East", "text": "East"},
+            {"value": "West", "text": "West"},
+            {"value": "Central", "text": "Central"},
+            {"value": "Rural", "text": "Rural"},
+            {"value": "Urban", "text": "Urban"}
+          ]
+        },
+        {
+          "name": "student_demographics",
+          "type": "custom",
+          "query": "All,General Population,Special Needs,English Language Learners,Low-Income",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "options": [
+            {"value": "All", "text": "All"},
+            {"value": "General Population", "text": "General Population"},
+            {"value": "Special Needs", "text": "Special Needs"},
+            {"value": "English Language Learners", "text": "English Language Learners"},
+            {"value": "Low-Income", "text": "Low-Income"}
+          ]
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Education Quality Alerts",
+          "datasource": "InfluxDB",
+          "enable": true,
+          "expr": "education_quality_alerts",
+          "iconColor": "orange",
+          "tags": ["education", "quality", "alerts"]
+        },
+        {
+          "name": "Accessibility Alerts",
+          "datasource": "InfluxDB",
+          "enable": true,
+          "expr": "accessibility_alerts",
+          "iconColor": "red",
+          "tags": ["education", "accessibility", "alerts"]
+        }
+      ]
+    },
+    "refresh": "5m",
+    "schemaVersion": 30,
+    "version": 1,
+    "links": [],
+    "gnetId": null,
+    "uid": "education-dashboard-$tenant_id"
+  }
+}

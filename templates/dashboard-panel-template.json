@@ -1,0 +1,53 @@
+{
+  "panelTemplate": {
+    "id": null,
+    "title": "Panel Title (No Units Here)",
+    "type": "stat",
+    "targets": [
+      {
+        "refId": "A",
+        "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"YOUR_METRIC_TYPE\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Human Readable Metric Name\",\n      additional_field: r.additional_field\n    }))",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-working"
+        }
+      }
+    ],
+    "fieldConfig": {
+      "defaults": {
+        "color": {
+          "mode": "thresholds"
+        },
+        "mappings": [],
+        "unit": "percent",
+        "thresholds": {
+          "steps": [
+            {"color": "red", "value": null},
+            {"color": "yellow", "value": 95},
+            {"color": "green", "value": 99}
+          ]
+        },
+        "displayName": "Human Readable Field Name"
+      }
+    },
+    "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+  },
+  "guidelines": {
+    "title": "Panel title should be clean and descriptive, NO units",
+    "query": "Flux query MUST include map() function for clean output",
+    "fieldConfig": "MUST include displayName and unit",
+    "units": "Set in fieldConfig.defaults.unit, NOT in title",
+    "fieldNames": "Use human-readable names, NOT technical terms like _value, _measurement",
+    "dataOutput": "Always transform raw data with map() function"
+  },
+  "examples": {
+    "goodTitle": "System Availability",
+    "badTitle": "System Availability (%)",
+    "goodUnit": "unit: \"percent\"",
+    "badUnit": "title: \"System Availability (%)",
+    "goodQuery": "map(fn: (r) => ({ _value: r._value, metric: \"Availability\" }))",
+    "badQuery": "yield(name: \"availability\")",
+    "goodDisplayName": "displayName: \"Availability\"",
+    "badDisplayName": "displayName: \"_value\""
+  }
+}

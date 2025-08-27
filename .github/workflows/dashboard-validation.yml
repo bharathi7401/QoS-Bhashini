@@ -1,0 +1,120 @@
+
+on:
+  push:
+    paths:
+      - '**/*.json'
+      - 'docs/GRAFANA_DASHBOARD_BEST_PRACTICES.md'
+      - 'scripts/**/*.py'
+  pull_request:
+    paths:
+      - '**/*.json'
+      - 'docs/GRAFANA_DASHBOARD_BEST_PRACTICES.md'
+      - 'scripts/**/*.py'
+
+jobs:
+  validate-dashboards:
+    name: Validate Grafana Dashboards
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+          
+      - name: Run comprehensive dashboard validation
+        run: |
+          python scripts/validate_all_dashboards.py
+          
+      - name: Run individual validation scripts
+        run: |
+          echo "Running individual validation scripts for detailed feedback..."
+          python scripts/validate_dashboard.py
+          python scripts/check_panel_count.py
+          python scripts/validate_queries.py
+          
+      - name: Check for validation errors
+        run: |
+          # Check if any validation failed
+          if ! python scripts/validate_all_dashboards.py; then
+            echo "❌ Dashboard validation failed"
+            exit 1
+          fi
+          echo "✅ All dashboard validations passed"
+          
+  lint-dashboards:
+    name: Lint Dashboard JSON
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Validate JSON syntax
+        run: |
+          echo "Validating JSON syntax for all dashboard files..."
+          for file in $(find . -name "*.json" -type f | grep -i dashboard); do
+            echo "Checking $file..."
+            if ! python -m json.tool "$file" > /dev/null 2>&1; then
+              echo "❌ Invalid JSON in $file"
+              exit 1
+            fi
+            echo "✅ $file has valid JSON syntax"
+          done
+          
+      - name: Check file formatting
+        run: |
+          echo "Checking dashboard file formatting..."
+          for file in $(find . -name "*.json" -type f | grep -i dashboard); do
+            echo "Formatting $file..."
+            # Format JSON with consistent indentation
+            python -m json.tool "$file" > "${file}.tmp"
+            mv "${file}.tmp" "$file"
+            echo "✅ $file formatted"
+          done
+          
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install security tools
+        run: |
+          pip install bandit safety
+          
+      - name: Run security scan on Python scripts
+        run: |
+          echo "Running security scan on validation scripts..."
+          bandit -r scripts/ -f json -o bandit-report.json || true
+          safety check || true
+          
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Checking for potential hardcoded secrets in dashboards..."
+          if grep -r "password\|secret\|token\|key" --include="*.json" . | grep -v "example\|test\|dummy"; then
+            echo "⚠️  Potential hardcoded secrets found in dashboard files"
+            echo "Please review and remove any actual secrets before committing"
+          else
+            echo "✅ No obvious hardcoded secrets found"
+          fi

@@ -1,14 +1,12 @@
 {
   "id": null,
   "title": "Bhashini Provider Overview",
-  "tags": [
-    "bhashini",
-    "provider",
-    "qos",
-    "monitoring"
-  ],
+  "tags": ["bhashini", "provider", "overview", "qos", "sla"],
   "style": "dark",
-  "timezone": "",
+  "timezone": "browser",
+  "annotations": {
+    "list": []
+  },
   "panels": [
     {
       "id": 1,
@@ -17,10 +15,10 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"System Status\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
@@ -33,1520 +31,353 @@
           "unit": "percent",
           "thresholds": {
             "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
             ]
-          }
+          },
+          "displayName": "System Status"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
     },
     {
       "id": 2,
-      "title": "Total API Calls",
+      "title": "Average Response Time",
       "type": "stat",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Response Time\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
-          "unit": "short"
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          },
+          "displayName": "Response Time"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
     },
     {
       "id": 3,
-      "title": "Active Tenants",
+      "title": "Error Rate",
       "type": "stat",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> distinct(column: \"tenant_id\")\n  |> count()\n  |> yield(name: \"active_tenants\")",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Error Rate\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
-          "unit": "none"
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          },
+          "displayName": "Error Rate"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
     },
     {
       "id": 4,
-      "title": "System Health Score",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "percent",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      }
-    },
-    {
-      "id": 5,
-      "title": "Average Response Time",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "ms",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 100
-              },
-              {
-                "color": "red",
-                "value": 200
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 8
-      }
-    },
-    {
-      "id": 6,
-      "title": "Overall Error Rate",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "percent",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 8
-      }
-    },
-    {
-      "id": 7,
-      "title": "Service Latency Trends",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.50)\n  |> yield(name: \"p50\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        },
-        {
-          "refId": "B",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.95)\n  |> yield(name: \"p95\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        },
-        {
-          "refId": "C",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.99)\n  |> yield(name: \"p99\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      }
-    },
-    {
-      "id": 8,
-      "title": "Throughput Patterns",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
-      }
-    },
-    {
-      "id": 9,
-      "title": "Availability Heatmap",
-      "type": "heatmap",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      }
-    },
-    {
-      "id": 10,
-      "title": "Capacity Utilization",
-      "type": "gauge",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 40
-      }
-    },
-    {
-      "id": 11,
-      "title": "SLA Compliance",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "none",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 40
-      }
-    },
-    {
-      "id": 12,
-      "title": "Traffic Growth Trends",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 40
-      }
-    },
-    {
-      "id": 13,
-      "title": "Peak Traffic Analysis",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 48
-      }
-    },
-    {
-      "id": 14,
-      "title": "Resource Allocation by Service",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 48
-      }
-    },
-    {
-      "id": 15,
-      "title": "System Status",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "percent",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "id": 16,
       "title": "Total API Calls",
       "type": "stat",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group()\n  |> sum()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Total API Calls\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "palette-classic"},
           "mappings": [],
-          "unit": "short"
+          "unit": "short",
+          "displayName": "API Calls"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
     },
     {
-      "id": 17,
+      "id": 5,
       "title": "Active Tenants",
       "type": "stat",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> distinct(column: \"tenant_id\")\n  |> count()\n  |> yield(name: \"active_tenants\")",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> group(columns: [\"tenant_id\"])\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Active Tenants\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "palette-classic"},
           "mappings": [],
-          "unit": "none"
+          "unit": "none",
+          "displayName": "Tenant Count"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8}
     },
     {
-      "id": 18,
-      "title": "System Health Score",
+      "id": 6,
+      "title": "SLA Compliance Rate",
       "type": "stat",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"value\"] >= 95.0)\n  |> group()\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"SLA Compliance\"\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "percent",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      }
-    },
-    {
-      "id": 19,
-      "title": "Average Response Time",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "ms",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 100
-              },
-              {
-                "color": "red",
-                "value": 200
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 8
-      }
-    },
-    {
-      "id": 20,
-      "title": "Overall Error Rate",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "unit": "percent",
-          "thresholds": {
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          }
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 8
-      }
-    },
-    {
-      "id": 21,
-      "title": "Service Latency Trends",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.50)\n  |> yield(name: \"p50\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        },
-        {
-          "refId": "B",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.95)\n  |> yield(name: \"p95\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        },
-        {
-          "refId": "C",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${service_name:json}) or array.contains(value: r[\"service_name\"], set: ${service_name:json}))\n  |> filter(fn: (r) => array.contains(value: \"All\", set: ${sla_tier:json}) or array.contains(value: r[\"sla_tier\"], set: ${sla_tier:json}))\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: quantile, createEmpty: false, q: 0.99)\n  |> yield(name: \"p99\")",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      }
-    },
-    {
-      "id": 22,
-      "title": "Throughput Patterns",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
-      }
-    },
-    {
-      "id": 23,
-      "title": "Availability Heatmap",
-      "type": "heatmap",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 95
-              },
-              {
-                "color": "green",
-                "value": 99
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      }
-    },
-    {
-      "id": 24,
-      "title": "Capacity Utilization",
-      "type": "gauge",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 40
-      }
-    },
-    {
-      "id": 25,
-      "title": "SLA Compliance",
-      "type": "stat",
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
           "unit": "none",
           "thresholds": {
             "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
             ]
-          }
+          },
+          "displayName": "SLA Compliance"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 40
-      }
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8}
     },
     {
-      "id": 26,
-      "title": "Traffic Growth Trends",
+      "id": 7,
+      "title": "Service Performance Overview",
       "type": "timeseries",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      availability: r._value\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "palette-classic"},
+          "unit": "percent",
           "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "gradientMode": "none"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
+          "displayName": "Availability"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 40
-      }
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
     },
     {
-      "id": 27,
-      "title": "Peak Traffic Analysis",
+      "id": 8,
+      "title": "Response Time Trends",
       "type": "timeseries",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      response_time: r._value\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "palette-classic"},
+          "unit": "ms",
           "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "gradientMode": "none"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ms"
+          "displayName": "Response Time"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 48
-      }
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
     },
     {
-      "id": 28,
-      "title": "Resource Allocation by Service",
+      "id": 9,
+      "title": "Error Rate Trends",
       "type": "timeseries",
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      error_rate: r._value\n    }))",
           "datasource": {
             "type": "influxdb",
-            "uid": "InfluxDB-Provider-CrossTenant"
+            "uid": "influxdb-working"
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": {"mode": "thresholds"},
+          "unit": "percent",
           "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "gradientMode": "none"
           },
-          "mappings": [],
           "thresholds": {
-            "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
             ]
           },
-          "unit": "ms"
+          "displayName": "Error Rate"
         }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 48
-      }
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+    },
+    {
+      "id": 10,
+      "title": "Throughput Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: sum, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      throughput: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "requests_per_minute",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Throughput"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+    },
+    {
+      "id": 11,
+      "title": "Tenant Performance Summary",
+      "type": "table",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"tenant_id\", \"sla_tier\"])\n  |> mean()\n  |> sort(columns: [\"tenant_id\"])\n  |> map(fn: (r) => ({\n      _time: r._time,\n      tenant: r.tenant_id,\n      sla_tier: r.sla_tier,\n      availability: r._value,\n      status: if r._value >= 99.0 then \"Excellent\" else if r._value >= 95.0 then \"Good\" else \"Poor\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "Tenant Performance"
+        }
+      },
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+    },
+    {
+      "id": 12,
+      "title": "Latency Heatmap by Service",
+      "type": "heatmap",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      latency: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "displayName": "Latency"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+    },
+    {
+      "id": 13,
+      "title": "Error Rate Heatmap by Service",
+      "type": "heatmap",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      error_rate: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40}
     }
   ],
-  "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": "$__all"
-        },
-        "datasource": {
-          "type": "influxdb",
-          "uid": "InfluxDB-Provider-CrossTenant"
-        },
-        "definition": "from(bucket: \"qos_metrics\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> group(columns: [\"service_name\"])\n  |> distinct(column: \"service_name\")\n  |> yield(name: \"service_names\")",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Service",
-        "multi": true,
-        "name": "service_name",
-        "options": [],
-        "query": "from(bucket: \"qos_metrics\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> group(columns: [\"service_name\"])\n  |> distinct(column: \"service_name\")\n  |> yield(name: \"service_names\")",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": "$__all"
-        },
-        "datasource": {
-          "type": "influxdb",
-          "uid": "InfluxDB-Provider-CrossTenant"
-        },
-        "definition": "from(bucket: \"qos_metrics\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> group(columns: [\"sla_tier\"])\n  |> distinct(column: \"sla_tier\")\n  |> yield(name: \"sla_tiers\")",
-        "hide": 0,
-        "includeAll": true,
-        "multi": true,
-        "name": "sla_tier",
-        "options": [],
-        "query": "from(bucket: \"qos_metrics\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> group(columns: [\"sla_tier\"])\n  |> distinct(column: \"sla_tier\")\n  |> yield(name: \"sla_tiers\")",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      }
-    ]
-  },
   "time": {
     "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
-  "uid": "bhashini-provider-overview",
-  "version": 1
+  "templating": {
+    "list": []
+  },
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "version": 1,
+  "links": [],
+  "uid": "bhashini-provider-overview"
 }

@@ -1,0 +1,24 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: SLA Rules
+    folder: SLA Monitoring
+    interval: 10s
+    rules:
+      - uid: sla-premium-availability
+        title: SLA Violation (Premium)
+        condition: A
+        for: 30s
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: InfluxDB-Provider-CrossTenant
+            model:
+              query: "from(bucket: \"qos_metrics\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\" and r.metric_type == \"availability\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({r with _value: r._value * 100.0}))\n  |> last()"
+              refId: A
+        labels:
+          alert_type: sla_violation
+          sla_tier: premium

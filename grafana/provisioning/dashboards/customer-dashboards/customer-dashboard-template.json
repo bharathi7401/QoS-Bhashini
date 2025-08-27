@@ -10,6 +10,22 @@
   ],
   "style": "dark",
   "timezone": "",
+  "annotations": {
+    "list": [
+      {
+        "name": "Incidents",
+        "type": "tags",
+        "tags": ["incident"],
+        "enable": true
+      },
+      {
+        "name": "Maintenance",
+        "type": "tags",
+        "tags": ["maintenance"],
+        "enable": true
+      }
+    ]
+  },
   "templating": {
     "list": [
       {
@@ -697,6 +713,109 @@
         "x": 16,
         "y": 32
       }
+    },
+    {
+      "id": 13,
+      "title": "Latency Heatmap by Service",
+      "type": "heatmap",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\" and r.metric_type == \"latency\" and r.tenant_id == \"{{TENANT_ID}}\")\n  |> filter(fn: (r) => r.service_name =~ /${service_filter:regex}/)\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"service_name\"], valueColumn: \"_value\")\n  |> yield(name: \"latency_heatmap\")",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB-Customer-{{TENANT_ID}}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "scheme"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "unit": "ms"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      }
+    },
+    {
+      "id": 14,
+      "title": "SLA Status",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\" and r.metric_type == \"availability\" and r.tenant_id == \"{{TENANT_ID}}\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({r with _value: r._value * 100.0}))\n  |> yield(name: \"sla_status\")",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB-Customer-{{TENANT_ID}}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "red",
+                "value": 99
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "links": [
+        {
+          "title": "View Alerts",
+          "url": "/alerting/grafana/sla-{{TENANT_ID}}-availability"
+        }
+      ]
     }
   ],
   "refresh": "30s",

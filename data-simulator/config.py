@@ -1,22 +1,20 @@
 import os
-from dotenv import load_dotenv
+# Removed dotenv loading to avoid conflicts with Docker environment variables
 
-# Load environment variables
-load_dotenv()
 
 class Config:
     """Configuration class for the Bhashini QoS Data Simulator"""
-    
+
     # InfluxDB Configuration
     INFLUXDB_URL = os.getenv('INFLUXDB_URL', 'http://localhost:8086')
-    INFLUXDB_TOKEN = os.getenv('INFLUXDB_TOKEN')
+    INFLUXDB_TOKEN = os.getenv('INFLUXDB_TOKEN', 'admin-token-123')  # Fallback token
     INFLUXDB_ORG = os.getenv('INFLUXDB_ORG', 'bhashini')
     INFLUXDB_BUCKET = os.getenv('INFLUXDB_BUCKET', 'qos_metrics')
-    
+
     # Simulation Configuration
     SIMULATION_INTERVAL = int(os.getenv('SIMULATION_INTERVAL', 10))  # seconds
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
-    
+
     # Service Configurations for Bhashini APIs
     SERVICES = {
         'translation': {
@@ -71,7 +69,7 @@ class Config:
             }
         }
     }
-    
+
     # Customer Tenant Definitions
     TENANTS = {
         'enterprise_1': {
@@ -110,7 +108,7 @@ class Config:
             'traffic_multiplier': 0.4
         }
     }
-    
+
     # Time-based Traffic Patterns
     TRAFFIC_PATTERNS = {
         'business_hours': {
@@ -130,7 +128,7 @@ class Config:
             'multiplier': 0.3
         }
     }
-    
+
     # Metric Generation Parameters
     METRICS = {
         'batch_size': 100,  # metrics per batch write

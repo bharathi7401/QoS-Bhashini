@@ -1,0 +1,85 @@
+{
+  "backup_dir": "backups",
+  "retention_days": 30,
+  "compression": true,
+  "encryption": false,
+  "notification": {
+    "enabled": false,
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "your-email@gmail.com",
+      "password": "your-app-password",
+      "recipients": ["admin@company.com"]
+    },
+    "slack": {
+      "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+      "channel": "#backups"
+    }
+  },
+  "sqlite_databases": [
+    "profiling.db",
+    "value_estimates.db",
+    "recommendations.db"
+  ],
+  "mysql_config": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "bi_user",
+    "password": "bi_password",
+    "database": "bi_profiling",
+    "charset": "utf8mb4",
+    "collation": "utf8mb4_unicode_ci"
+  },
+  "schedules": {
+    "daily": {
+      "enabled": true,
+      "time": "02:00",
+      "type": "all",
+      "retention_days": 7
+    },
+    "weekly": {
+      "enabled": true,
+      "day": "sunday",
+      "time": "03:00",
+      "type": "all",
+      "retention_days": 30
+    },
+    "monthly": {
+      "enabled": true,
+      "day": 1,
+      "time": "04:00",
+      "type": "all",
+      "retention_days": 365
+    }
+  },
+  "verification": {
+    "enabled": true,
+    "verify_after_backup": true,
+    "verify_after_restore": true,
+    "checksum_verification": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": {
+      "backup_duration": true,
+      "backup_size": true,
+      "restore_duration": true,
+      "verification_results": true
+    },
+    "alerts": {
+      "backup_failure": true,
+      "restore_failure": true,
+      "verification_failure": true,
+      "disk_space_low": true
+    }
+  },
+  "advanced": {
+    "parallel_backups": 2,
+    "chunk_size_mb": 100,
+    "temp_directory": "/tmp",
+    "log_level": "INFO",
+    "max_log_files": 10,
+    "log_retention_days": 90
+  }
+}
