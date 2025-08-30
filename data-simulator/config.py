@@ -6,7 +6,7 @@ class Config:
     """Configuration class for the Bhashini QoS Data Simulator"""
 
     # InfluxDB Configuration
-    INFLUXDB_URL = os.getenv('INFLUXDB_URL', 'http://localhost:8086')
+    INFLUXDB_URL = os.getenv('INFLUXDB_URL', 'http://127.0.0.1:8086')
     INFLUXDB_TOKEN = os.getenv('INFLUXDB_TOKEN', 'admin-token-123')  # Fallback token
     INFLUXDB_ORG = os.getenv('INFLUXDB_ORG', 'bhashini')
     INFLUXDB_BUCKET = os.getenv('INFLUXDB_BUCKET', 'qos_metrics')

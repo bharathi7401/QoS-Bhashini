@@ -120,8 +120,8 @@ class ValueImpactCalculator:
         """Load sector-specific configuration"""
         try:
             if self.config_path.exists():
-                with open(self.config_path, 'r') as f:
-                    return yaml.safe_load(f)
+            with open(self.config_path, 'r') as f:
+                return yaml.safe_load(f)
             else:
                 logger.warning(f"Sector config file not found: {self.config_path}")
                 return {}
@@ -442,27 +442,27 @@ class ValueImpactCalculator:
         normalized_quality = quality_improvements * 100  # Already 0-1 scale
         
         # Weighted combination
-        weights = {
+            weights = {
             "cost": 0.35,      # 35% weight for cost savings
             "reach": 0.25,     # 25% weight for user reach
             "efficiency": 0.25, # 25% weight for efficiency
             "quality": 0.15    # 15% weight for quality
-        }
-        
-        total_score = (
+            }
+            
+            total_score = (
             normalized_cost * weights["cost"] +
             normalized_reach * weights["reach"] +
             normalized_efficiency * weights["efficiency"] +
             normalized_quality * weights["quality"]
-        )
-        
-        return round(total_score, 2)
-    
+            )
+            
+            return round(total_score, 2)
+            
     def _calculate_confidence_score(self, qos_metrics: List[QoSMetrics], 
                                   customer_profile: CustomerProfile) -> float:
         """Calculate confidence score for the value calculation"""
-        confidence_factors = []
-        
+            confidence_factors = []
+            
         # Data completeness factor
         required_metrics = ["availability_percent", "response_time_p95", "error_rate"]
         completeness_score = 0.0
@@ -516,7 +516,7 @@ class ValueImpactCalculator:
         # Calculate ROI
         if estimated_service_cost > 0:
             roi_ratio = cost_savings / estimated_service_cost
-        else:
+            else:
             roi_ratio = 0.0
         
         return round(roi_ratio, 2)
@@ -529,7 +529,7 @@ class ValueImpactCalculator:
             service_cost_multiplier = 3.0
         elif customer_profile.target_user_base > 10000:
             service_cost_multiplier = 2.0
-        else:
+            else:
             service_cost_multiplier = 1.0
         
         sla_multipliers = {"basic": 1.0, "standard": 1.5, "premium": 2.5}
@@ -549,7 +549,7 @@ class ValueImpactCalculator:
         """Generate summary of QoS metrics"""
         if not qos_metrics:
             return {}
-        
+    
         summary = {
             "total_metrics": len(qos_metrics),
             "service_types": list(set(m.service_type for m in qos_metrics)),

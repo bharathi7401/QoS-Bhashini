@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhashini QoS Dashboards - Public Access</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .dashboard-card h3 {
+            margin: 0 0 15px 0;
+            color: #fff;
+            font-size: 1.3em;
+        }
+        .dashboard-card p {
+            margin: 0 0 20px 0;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        .dashboard-card a {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .dashboard-card a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .stat-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0.7;
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Bhashini QoS Dashboards</h1>
+            <p>Real-time monitoring and analytics for Bhashini's AI services</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h4>Total Customers</h4>
+                <div class="value">3</div>
+            </div>
+            <div class="stat-card">
+                <h4>Services Monitored</h4>
+                <div class="value">4</div>
+            </div>
+            <div class="stat-card">
+                <h4>Real-time Metrics</h4>
+                <div class="value">24/7</div>
+            </div>
+            <div class="stat-card">
+                <h4>SLA Compliance</h4>
+                <div class="value">99.9%</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3>🏢 Ultimate QoS Dashboard</h3>
+                <p>Comprehensive overview of all services, customers, and performance metrics. Includes top 5 and worst 5 customer rankings. Throughput shown as RPM.</p>
+                <a href="http://localhost:3010/d/be149f0f-0844-4616-83c5-3e896d6aa98b/bhashini-ultimate-qos-dashboard-v2" target="_blank">View Dashboard</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>👥 Customer Overview</h3>
+                <p>Side-by-side comparison of all customer metrics including availability, response time, error rates, and throughput.</p>
+                <a href="http://localhost:3010/d/bhashini-customer-overview/bhashini-customer-overview-dashboard" target="_blank">View Dashboard</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>🏛️ Enterprise 1 Dashboard</h3>
+                <p>Dedicated monitoring for Enterprise 1 customer with premium SLA requirements (99% availability, <100ms response time).</p>
+                <a href="http://localhost:3010/d/tenant-enterprise-1-dashboard/enterprise-1-qos-sla-dashboard" target="_blank">View Dashboard</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>🚀 Startup 1 Dashboard</h3>
+                <p>Performance monitoring for Startup 1 with standard SLA requirements (95% availability, <200ms response time).</p>
+                <a href="http://localhost:3010/d/tenant-startup-1-dashboard/startup-1-qos-sla-dashboard" target="_blank">View Dashboard</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>🆓 Freemium 1 Dashboard</h3>
+                <p>Basic monitoring for Freemium 1 customer with basic SLA requirements (90% availability, <500ms response time).</p>
+                <a href="http://localhost:3010/d/tenant-freemium-1-dashboard/freemium-1-qos-sla-dashboard" target="_blank">View Dashboard</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>📊 Provider Overview</h3>
+                <p>Bhashini provider-level metrics and cross-tenant analytics for business intelligence and capacity planning.</p>
+                <a href="http://localhost:3010/d/bhashini-provider-overview/bhashini-provider-overview" target="_blank">View Dashboard</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Bhashini. Real-time QoS monitoring and SLA compliance tracking.</p>
+            <p>For support, contact: support@bhashini.com</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stats on load
+            const statValues = document.querySelectorAll('.value');
+            statValues.forEach((stat, index) => {
+                setTimeout(() => {
+                    stat.style.opacity = '0';
+                    stat.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        stat.style.transition = 'all 0.5s ease';
+                        stat.style.opacity = '1';
+                        stat.style.transform = 'scale(1)';
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Add click tracking for analytics
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    console.log('Dashboard accessed:', this.href);
+                    // Here you could send analytics data
+                });
+            });
+        });
+    </script>
+</body>
+</html>

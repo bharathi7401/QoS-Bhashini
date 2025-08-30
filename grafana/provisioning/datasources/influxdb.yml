@@ -2,11 +2,12 @@ apiVersion: 1
 
 datasources:
   - name: InfluxDB-QoS-Metrics
+    uid: influxdb-qos-metrics
     type: influxdb
     access: proxy
-    url: http://influxdb:8086
+    url: http://127.0.0.1:8086
     secureJsonData:
-      token: 
+      token: admin-token-123
     jsonData:
       version: Flux
       organization: bhashini
@@ -15,3 +16,12 @@ datasources:
       httpMethod: POST
       queryTimeout: 60s
       maxSeries: 10000
+      httpHeaders:
+        - name: Authorization
+          value: Token admin-token-123
+      defaultQuery: |
+        from(bucket: "qos_metrics")
+          |> range(start: -1h)
+          |> filter(fn: (r) => r["_measurement"] == "api_calls")
+          |> group(columns: ["service", "tenant"])
+          |> mean()

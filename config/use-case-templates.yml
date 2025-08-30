@@ -39,10 +39,10 @@ use_case_templates:
         response_time: "< 2 seconds"
         accuracy: "> 95%"
         scalability: "Auto-scaling for peak hours"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Citizen satisfaction score > 4.0"
-        - "Service completion time < 30 minutes"
+          - "Service completion time < 30 minutes"
         - "Digital adoption rate > 80%"
         - "Language coverage > 10 languages"
     
@@ -77,8 +77,8 @@ use_case_templates:
         response_time: "< 1 second for critical alerts"
         accuracy: "> 98%"
         reliability: "Redundant systems"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Alert delivery success rate = 100%"
         - "Critical communication response time < 30 seconds"
         - "Citizen reach > 95%"
@@ -115,8 +115,8 @@ use_case_templates:
         response_time: "< 5 seconds"
         accuracy: "> 90%"
         security: "Data encryption and privacy"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Process efficiency improvement > 20%"
         - "Citizen satisfaction > 4.0"
         - "Processing time reduction > 30%"
@@ -158,8 +158,8 @@ use_case_templates:
         response_time: "< 1 second for critical communications"
         accuracy: "> 98% for medical terms"
         security: "HIPAA compliance"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Medical translation accuracy > 98%"
         - "Patient satisfaction > 4.5"
         - "Communication error rate < 0.5%"
@@ -196,10 +196,10 @@ use_case_templates:
         response_time: "< 500ms for real-time"
         accuracy: "> 99% for critical communications"
         latency: "Minimal for real-time services"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Real-time interpretation quality > 4.5"
-        - "Consultation success rate > 95%"
+          - "Consultation success rate > 95%"
         - "Patient communication success > 90%"
         - "Emergency response time < 15 seconds"
     
@@ -234,8 +234,8 @@ use_case_templates:
         response_time: "< 3 seconds"
         accuracy: "> 95%"
         accessibility: "Multi-language support"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Public health reach > 85%"
         - "Information accuracy > 95%"
         - "Community engagement > 70%"
@@ -254,7 +254,7 @@ use_case_templates:
           languages: ["English", "Hindi", "Regional Languages", "Subject-specific Terminology"]
           use_cases:
             - "Curriculum content translation"
-            - "Educational material localization"
+          - "Educational material localization"
             - "Assessment tool translation"
             - "Learning resource adaptation"
         
@@ -279,8 +279,8 @@ use_case_templates:
         response_time: "< 3 seconds"
         accuracy: "> 90%"
         content_quality: "Educational standards compliance"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Curriculum coverage > 90%"
         - "Material adaptation success > 85%"
         - "Content quality score > 4.0"
@@ -319,8 +319,8 @@ use_case_templates:
         response_time: "< 2 seconds"
         accuracy: "> 85%"
         scalability: "Support for multiple students"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Platform usage across languages > 80%"
         - "Student interaction rate > 75%"
         - "Learning outcome improvement > 15%"
@@ -359,8 +359,8 @@ use_case_templates:
         response_time: "< 5 seconds"
         accuracy: "> 80%"
         accessibility: "WCAG compliance"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Special needs support effectiveness > 4.0"
         - "Inclusive tool usage > 85%"
         - "Learning barrier reduction > 20%"
@@ -398,8 +398,8 @@ use_case_templates:
             - "Voice-based customer service"
             - "Business process automation"
             - "Quality assurance systems"
-      
-      technical_requirements:
+        
+        technical_requirements:
         availability: "99.0%"
         response_time: "< 2.5 seconds"
         accuracy: "> 85%"
@@ -444,8 +444,8 @@ use_case_templates:
         response_time: "< 2 seconds"
         accuracy: "> 90%"
         user_experience: "Intuitive and responsive"
-      
-      success_metrics:
+        
+        success_metrics:
         - "User interface response time < 2 seconds"
         - "Service quality rating > 4.0"
         - "User engagement rate > 75%"
@@ -483,8 +483,8 @@ use_case_templates:
             - "Voice-based service requests"
             - "Community reporting systems"
             - "Accessibility features"
-      
-      technical_requirements:
+        
+        technical_requirements:
         availability: "97.0%"
         response_time: "< 4 seconds"
         accuracy: "> 80%"
@@ -529,8 +529,8 @@ use_case_templates:
         response_time: "< 5 seconds"
         accuracy: "> 75%"
         data_collection: "Comprehensive and reliable"
-      
-      success_metrics:
+        
+        success_metrics:
         - "Impact measurement accuracy > 80%"
         - "Community feedback collection > 70%"
         - "Development progress tracking > 75%"

@@ -148,7 +148,7 @@ class SectorDashboardGenerator:
         if sector not in self.sector_config.get('sectors', {}):
             logger.warning(f"Sector {sector} not found in configuration")
             return dashboard
-        
+            
         sector_config = self.sector_config['sectors'][sector]
         kpis = sector_config.get('kpis', {})
         
@@ -186,8 +186,8 @@ class SectorDashboardGenerator:
                           panel_id: int, customer_profile: Dict[str, Any]) -> Dict[str, Any]:
         """Create KPI panel from metric configuration"""
         panel_type = metric_config.get('panel_type', 'stat')
-        
-        panel = {
+            
+            panel = {
             "id": panel_id,
             "title": metric_config.get('name', metric_name.replace('_', ' ').title()),
             "type": panel_type,
@@ -200,12 +200,12 @@ class SectorDashboardGenerator:
                     "legendFormat": metric_config.get('name', metric_name)
                 }
             ],
-            "fieldConfig": {
-                "defaults": {
+                "fieldConfig": {
+                    "defaults": {
                     "unit": metric_config.get('unit', 'short'),
                     "decimals": metric_config.get('decimals', 2),
-                    "thresholds": {
-                        "steps": [
+                        "thresholds": {
+                            "steps": [
                             {"color": "red", "value": None},
                             {"color": "yellow", "value": metric_config.get('critical', 0)},
                             {"color": "green", "value": metric_config.get('target', 100)}
@@ -213,10 +213,10 @@ class SectorDashboardGenerator:
                     }
                 }
             }
-        }
-        
-        return panel
-    
+            }
+            
+            return panel
+            
     def _validate_dashboard(self, dashboard: Dict[str, Any]) -> Dict[str, Any]:
         """Validate generated dashboard for correctness"""
         validation_result = {
@@ -273,7 +273,7 @@ class SectorDashboardGenerator:
         if not template:
             logger.error(f"Failed to get template for sector: {sector}")
             return None
-        
+    
         # Inject customer-specific values
         dashboard = self._inject_customer_specific_values(template, customer_profile)
         
@@ -285,7 +285,7 @@ class SectorDashboardGenerator:
         if not validation["is_valid"]:
             logger.error(f"Dashboard validation failed: {validation['errors']}")
             return None
-        
+    
         if validation["warnings"]:
             logger.warning(f"Dashboard validation warnings: {validation['warnings']}")
         
@@ -296,7 +296,7 @@ class SectorDashboardGenerator:
         self.generation_metrics["templates_used"].add(f"{sector}-template")
         
         logger.info(f"Successfully generated dashboard for {tenant_id}")
-        return dashboard
+            return dashboard
     
     def save_dashboard(self, dashboard: Dict[str, Any], 
                       customer_profile: Dict[str, Any]) -> bool:
@@ -360,8 +360,8 @@ class SectorDashboardGenerator:
                         "tenant_id": profile.get('tenant_id'),
                         "error": "Failed to generate dashboard"
                     })
-                    
-            except Exception as e:
+            
+        except Exception as e:
                 results["failed_generations"] += 1
                 results["errors"].append({
                     "tenant_id": profile.get('tenant_id'),
@@ -424,7 +424,7 @@ class SectorDashboardGenerator:
             test_results["overall_status"] = "failed"
         elif any(test["status"] == "warning" for test in test_results["query_tests"]):
             test_results["overall_status"] = "warning"
-        else:
+                        else:
             test_results["overall_status"] = "passed"
         
         return test_results
@@ -460,9 +460,9 @@ def main():
         # Show metrics
         metrics = generator.get_generation_metrics()
         print(f"Generation metrics: {metrics}")
-    else:
-        print("Failed to generate dashboard")
-
+        else:
+            print("Failed to generate dashboard")
+            
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,74 @@
+apiVersion: 1
+
+providers:
+  - name: 'provider-dashboards'
+    orgId: 1
+    folder: 'Bhashini Provider'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/provider-dashboards
+      foldersFromFilesStructure: true
+
+  # Working dashboards are commented out to avoid conflicts with existing dashboards
+  # - name: 'working-dashboards'
+  #   orgId: 1
+  #   folder: 'Working Dashboards'
+  #   type: file
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 30
+  #   allowUiUpdates: true
+  #   options:
+  #     path: /etc/grafana/provisioning/dashboards/working
+  #     foldersFromFilesStructure: true
+
+  # Tenant dashboards for individual tenant monitoring (temporarily disabled due to duplicate UID issues)
+  # - name: 'tenant-dashboards'
+  #   orgId: 1
+  #   folder: 'Tenant Dashboards'
+  #   type: file
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 30
+  #   allowUiUpdates: true
+  #   options:
+  #     path: /etc/grafana/provisioning/dashboards/tenant-dashboards
+  #       foldersFromFilesStructure: true
+
+  # Customer overview dashboard for Bhashini team
+  - name: 'customer-overview-dashboard'
+    orgId: 1
+    folder: 'Customer Overview'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/customer-dashboards
+      foldersFromFilesStructure: true
+
+  # Customer alerting rules
+  - name: 'customer-alerts'
+    orgId: 1
+    folder: 'Customer Monitoring'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/alerting
+      foldersFromFilesStructure: true
+
+  # Customer dashboards are provisioned via API by provision-customer-dashboards.py
+  # This prevents duplicate provisioning and allows dynamic tenant management
+  # - name: 'customer-dashboards'
+  #   orgId: 1
+  #   folder: 'Customer Dashboards'
+  #   type: file
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 30
+  #   allowUiUpdates: true
+  #   options:
+  #       path: /etc/grafana/provisioning/dashboards/customer-dashboards
+  #       foldersFromFilesStructure: true

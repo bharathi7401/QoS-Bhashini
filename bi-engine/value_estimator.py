@@ -420,7 +420,7 @@ class ValueEstimator:
             
             logger.info(f"Payback period calculated: {payback_months:.1f} months")
             return payback_months
-            
+                
         except Exception as e:
             logger.error(f"Error calculating payback period: {e}")
             return 60.0
@@ -457,7 +457,7 @@ class ValueEstimator:
             
             logger.info(f"Confidence score calculated: {confidence:.1f}%")
             return confidence
-            
+                
         except Exception as e:
             logger.error(f"Error calculating confidence score: {e}")
             return 50.0
@@ -527,7 +527,8 @@ class ValueEstimator:
             # Efficiency recommendations
             if value_metrics.efficiency_gains < 20:
                 recommendations.append("Optimize service performance to improve efficiency gains")
-            
+        
+        try:
             # Quality recommendations
             if value_metrics.quality_improvements < 30:
                 recommendations.append("Implement quality improvement measures for better user satisfaction")
@@ -539,8 +540,8 @@ class ValueEstimator:
             # Payback period recommendations
             if value_metrics.payback_period_months > 24:
                 recommendations.append("Consider phased implementation to reduce initial investment")
-            
-            return recommendations
+        
+        return recommendations
             
         except Exception as e:
             logger.error(f"Error generating recommendations: {e}")

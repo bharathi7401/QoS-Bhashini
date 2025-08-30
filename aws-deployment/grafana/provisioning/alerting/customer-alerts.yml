@@ -1,0 +1,213 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: Customer SLA Rules
+    folder: Customer Monitoring
+    interval: 30s
+    rules:
+      - uid: enterprise-1-availability-alert
+        title: Enterprise 1 - Availability Below 99%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.tenant_id == \"enterprise_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: sla_violation
+          customer: enterprise_1
+          sla_tier: premium
+          severity: critical
+        annotations:
+          summary: "Enterprise 1 availability is {{ $value }}% (below 99% SLA)"
+          description: "Enterprise 1 customer is experiencing availability issues. Current availability: {{ $value }}%"
+
+      - uid: startup-1-availability-alert
+        title: Startup 1 - Availability Below 95%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.tenant_id == \"startup_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: sla_violation
+          customer: startup_1
+          sla_tier: standard
+          severity: warning
+        annotations:
+          summary: "Startup 1 availability is {{ $value }}% (below 95% SLA)"
+          description: "Startup 1 customer is experiencing availability issues. Current availability: {{ $value }}%"
+
+      - uid: freemium-1-availability-alert
+        title: Freemium 1 - Availability Below 90%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.tenant_id == \"freemium_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: sla_violation
+          customer: freemium_1
+          sla_tier: basic
+          severity: info
+        annotations:
+          summary: "Freemium 1 availability is {{ $value }}% (below 90% SLA)"
+          description: "Freemium 1 customer is experiencing availability issues. Current availability: {{ $value }}%"
+
+      - uid: enterprise-1-latency-alert
+        title: Enterprise 1 - Response Time Above 100ms
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.tenant_id == \"enterprise_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: performance_degradation
+          customer: enterprise_1
+          sla_tier: premium
+          severity: warning
+        annotations:
+          summary: "Enterprise 1 response time is {{ $value }}ms (above 100ms threshold)"
+          description: "Enterprise 1 customer is experiencing high latency. Current response time: {{ $value }}ms"
+
+      - uid: startup-1-latency-alert
+        title: Startup 1 - Response Time Above 200ms
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.tenant_id == \"startup_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: performance_degradation
+          customer: startup_1
+          sla_tier: standard
+          severity: warning
+        annotations:
+          summary: "Startup 1 response time is {{ $value }}ms (above 200ms threshold)"
+          description: "Startup 1 customer is experiencing high latency. Current response time: {{ $value }}ms"
+
+      - uid: freemium-1-latency-alert
+        title: Freemium 1 - Response Time Above 500ms
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.tenant_id == \"freemium_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: performance_degradation
+          customer: freemium_1
+          sla_tier: basic
+          severity: info
+        annotations:
+          summary: "Freemium 1 response time is {{ $value }}ms (above 500ms threshold)"
+          description: "Freemium 1 customer is experiencing high latency. Current response time: {{ $value }}ms"
+
+      - uid: enterprise-1-error-rate-alert
+        title: Enterprise 1 - Error Rate Above 1%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.tenant_id == \"enterprise_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: error_rate_spike
+          customer: enterprise_1
+          sla_tier: premium
+          severity: critical
+        annotations:
+          summary: "Enterprise 1 error rate is {{ $value }}% (above 1% threshold)"
+          description: "Enterprise 1 customer is experiencing high error rates. Current error rate: {{ $value }}%"
+
+      - uid: startup-1-error-rate-alert
+        title: Startup 1 - Error Rate Above 5%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.tenant_id == \"startup_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: error_rate_spike
+          customer: startup_1
+          sla_tier: standard
+          severity: warning
+        annotations:
+          summary: "Startup 1 error rate is {{ $value }}% (above 5% threshold)"
+          description: "Startup 1 customer is experiencing high error rates. Current error rate: {{ $value }}%"
+
+      - uid: freemium-1-error-rate-alert
+        title: Freemium 1 - Error Rate Above 10%
+        condition: A
+        for: 1m
+        data:
+          - refId: A
+            queryType: ""
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb-qos-metrics
+            model:
+              query: "from(bucket: \"qos_metrics\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.tenant_id == \"freemium_1\") |> group() |> mean() |> last()"
+              refId: A
+        labels:
+          alert_type: error_rate_spike
+          customer: freemium_1
+          sla_tier: basic
+          severity: warning
+        annotations:
+          summary: "Freemium 1 error rate is {{ $value }}% (above 10% threshold)"
+          description: "Freemium 1 customer is experiencing high error rates. Current error rate: {{ $value }}%"

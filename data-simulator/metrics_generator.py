@@ -137,56 +137,61 @@ class MetricsGenerator:
                 availability = self.generate_availability(service_name, tenant_id)
 
                 # Create metric points for each metric type
+                service_tag = service_name.lower()
                 metrics.extend([
                     {
                         'measurement': 'qos_metrics',
                         'tags': {
-                            'tenant_id': tenant_id,
-                            'service_name': service_name,
+                            'customer_id': tenant_id,
+                            'service': service_tag,
                             'metric_type': 'latency',
                             'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
                         },
                         'fields': {
-                            'value': latency
+                            'value': latency,
+                            'unit': 'ms'
                         },
                         'time': self.current_time
                     },
                     {
                         'measurement': 'qos_metrics',
                         'tags': {
-                            'tenant_id': tenant_id,
-                            'service_name': service_name,
+                            'customer_id': tenant_id,
+                            'service': service_tag,
                             'metric_type': 'error_rate',
                             'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
                         },
                         'fields': {
-                            'value': error_rate
+                            'value': error_rate,
+                            'unit': 'percent'
                         },
                         'time': self.current_time
                     },
                     {
                         'measurement': 'qos_metrics',
                         'tags': {
-                            'tenant_id': tenant_id,
-                            'service_name': service_name,
+                            'customer_id': tenant_id,
+                            'service': service_tag,
                             'metric_type': 'throughput',
                             'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
                         },
                         'fields': {
-                            'value': throughput
+                            'value': throughput,
+                            'unit': 'requests_per_minute'
                         },
                         'time': self.current_time
                     },
                     {
                         'measurement': 'qos_metrics',
                         'tags': {
-                            'tenant_id': tenant_id,
-                            'service_name': service_name,
+                            'customer_id': tenant_id,
+                            'service': service_tag,
                             'metric_type': 'availability',
                             'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
                         },
                         'fields': {
-                            'value': availability
+                            'value': availability,
+                            'unit': 'percent'
                         },
                         'time': self.current_time
                     }

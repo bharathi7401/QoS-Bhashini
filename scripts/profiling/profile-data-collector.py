@@ -101,8 +101,8 @@ class ProfileDataCollector:
         """Load existing tenant configuration"""
         try:
             if self.config_path.exists():
-                with open(self.config_path, 'r') as f:
-                    return yaml.safe_load(f)
+            with open(self.config_path, 'r') as f:
+                return yaml.safe_load(f)
             else:
                 logger.warning(f"Tenant config file not found: {self.config_path}")
                 return {}
@@ -416,7 +416,7 @@ class ProfileDataCollector:
     
     def _analyze_geographical_context(self, regions: List[str]) -> Dict[str, Any]:
         """Analyze geographical coverage context"""
-        return {
+            return {
             "total_regions": len(regions),
             "has_national_coverage": any("national" in region.lower() for region in regions),
             "has_international_coverage": any("international" in region.lower() for region in regions),
@@ -425,7 +425,7 @@ class ProfileDataCollector:
     
     def _analyze_language_context(self, languages: List[str]) -> Dict[str, Any]:
         """Analyze language requirements context"""
-        return {
+            return {
             "total_languages": len(languages),
             "includes_english": "English" in languages or "english" in [lang.lower() for lang in languages],
             "includes_hindi": "Hindi" in languages or "hindi" in [lang.lower() for lang in languages],
@@ -524,7 +524,7 @@ class ProfileDataCollector:
                     forms = data
                 elif isinstance(data, dict) and "forms" in data:
                     forms = data["forms"]
-                else:
+                    else:
                     forms = [data]
                 
                 for form_num, form in enumerate(forms, start=1):
@@ -544,8 +544,8 @@ class ProfileDataCollector:
                             errors=[f"Processing error: {str(e)}"],
                             warnings=[]
                         ))
-        
-        except Exception as e:
+                
+            except Exception as e:
             logger.error(f"Error reading JSON file: {e}")
         
         return results
@@ -616,7 +616,7 @@ class ProfileDataCollector:
             with open(self.config_path, 'w') as f:
                 yaml.dump(self.tenant_config, f, default_flow_style=False, indent=2)
             logger.info("Tenant configuration saved successfully")
-        except Exception as e:
+            except Exception as e:
             logger.error(f"Error saving tenant configuration: {e}")
     
     def get_quality_report(self) -> Dict[str, Any]:

@@ -13,20 +13,20 @@ sectors:
       compliance_score: 95
     
     kpis:
-      citizen_service_efficiency:
-        name: "Citizen Service Efficiency"
+    citizen_service_efficiency:
+      name: "Citizen Service Efficiency"
         description: "Measures the effectiveness of government services for citizens"
         metrics:
           - name: "Average Service Completion Time"
-            unit: "minutes"
-            target: "< 30"
+          unit: "minutes"
+          target: "< 30"
             critical: "> 60"
             query: "avg(service_completion_time)"
             panel_type: "stat"
             
           - name: "Citizen Satisfaction Score"
-            unit: "score"
-            target: "> 4.0"
+          unit: "score"
+          target: "> 4.0"
             critical: "< 3.0"
             query: "avg(citizen_satisfaction)"
             panel_type: "gauge"
@@ -39,51 +39,51 @@ sectors:
             panel_type: "stat"
             
           - name: "Service Availability During Business Hours"
-            unit: "percentage"
+          unit: "percentage"
             target: "> 99.5"
             critical: "< 98"
             query: "avg(availability) where time >= '09:00' and time <= '17:00'"
             panel_type: "timeseries"
       
-      compliance_monitoring:
-        name: "Compliance Monitoring"
+    compliance_monitoring:
+      name: "Compliance Monitoring"
         description: "Tracks adherence to government regulations and standards"
         metrics:
           - name: "Data Privacy Adherence"
-            unit: "score"
-            target: "100"
+          unit: "score"
+          target: "100"
             critical: "< 95"
             query: "avg(privacy_compliance_score)"
             panel_type: "gauge"
             
           - name: "Accessibility Standards Compliance"
-            unit: "score"
-            target: "100"
+          unit: "score"
+          target: "100"
             critical: "< 90"
             query: "avg(accessibility_compliance_score)"
             panel_type: "gauge"
             
           - name: "Regulatory Requirement Tracking"
-            unit: "percentage"
-            target: "100"
+          unit: "percentage"
+          target: "100"
             critical: "< 95"
             query: "sum(met_requirements) / sum(total_requirements) * 100"
             panel_type: "stat"
       
-      operational_efficiency:
-        name: "Operational Efficiency"
+    operational_efficiency:
+      name: "Operational Efficiency"
         description: "Measures operational performance and resource utilization"
         metrics:
           - name: "Cost Per Transaction"
-            unit: "USD"
+          unit: "USD"
             target: "< 2.00"
             critical: "> 5.00"
             query: "avg(transaction_cost)"
             panel_type: "stat"
             
           - name: "Service Availability"
-            unit: "percentage"
-            target: "> 99.5"
+          unit: "percentage"
+          target: "> 99.5"
             critical: "< 98"
             query: "avg(availability)"
             panel_type: "timeseries"
@@ -118,7 +118,7 @@ sectors:
         description: "Critical communication monitoring during crisis situations"
         metrics:
           - name: "Emergency Alert Delivery Success"
-            unit: "percentage"
+          unit: "percentage"
             target: "100"
             critical: "< 95"
             query: "sum(successful_deliveries) / sum(total_alerts) * 100"
@@ -142,13 +142,13 @@ sectors:
       accuracy_score: 98
     
     kpis:
-      patient_communication_quality:
-        name: "Patient Communication Quality"
+    patient_communication_quality:
+      name: "Patient Communication Quality"
         description: "Measures the quality and effectiveness of patient communications"
         metrics:
           - name: "Translation Accuracy for Medical Terms"
-            unit: "percentage"
-            target: "> 98"
+          unit: "percentage"
+          target: "> 98"
             critical: "< 95"
             query: "avg(medical_translation_accuracy)"
             panel_type: "gauge"
@@ -161,39 +161,39 @@ sectors:
             panel_type: "stat"
             
           - name: "Patient Satisfaction with Multilingual Services"
-            unit: "score"
-            target: "> 4.5"
+          unit: "score"
+          target: "> 4.5"
             critical: "< 4.0"
             query: "avg(patient_satisfaction_score)"
             panel_type: "gauge"
       
-      safety_monitoring:
-        name: "Safety Monitoring"
+    safety_monitoring:
+      name: "Safety Monitoring"
         description: "Tracks patient safety and critical communication reliability"
         metrics:
           - name: "Error Rate in Medical Translations"
-            unit: "percentage"
+          unit: "percentage"
             target: "< 0.5"
             critical: "> 1.0"
             query: "avg(translation_error_rate)"
             panel_type: "stat"
             
           - name: "Critical Communication Delivery Success"
-            unit: "percentage"
-            target: "100"
+          unit: "percentage"
+          target: "100"
             critical: "< 99"
             query: "sum(successful_critical_deliveries) / sum(total_critical_communications) * 100"
             panel_type: "gauge"
             
           - name: "Healthcare Data Privacy Compliance"
-            unit: "score"
-            target: "100"
+          unit: "score"
+          target: "100"
             critical: "< 98"
             query: "avg(hipaa_compliance_score)"
             panel_type: "gauge"
       
-      accessibility:
-        name: "Accessibility"
+    accessibility:
+      name: "Accessibility"
         description: "Measures healthcare service reach and accessibility"
         metrics:
           - name: "Language Coverage for Patient Populations"
@@ -204,8 +204,8 @@ sectors:
             panel_type: "stat"
             
           - name: "Special Needs Accommodation"
-            unit: "percentage"
-            target: "> 95"
+          unit: "percentage"
+          target: "> 95"
             critical: "< 85"
             query: "sum(accommodated_patients) / sum(total_patients) * 100"
             panel_type: "gauge"
@@ -222,8 +222,8 @@ sectors:
         description: "Real-time interpretation and remote consultation services"
         metrics:
           - name: "Real-time Interpretation Quality"
-            unit: "score"
-            target: "> 4.5"
+          unit: "score"
+          target: "> 4.5"
             critical: "< 4.0"
             query: "avg(interpretation_quality_score)"
             panel_type: "gauge"
@@ -278,33 +278,33 @@ sectors:
       content_quality: 90
     
     kpis:
-      content_localization:
-        name: "Content Localization"
+    content_localization:
+      name: "Content Localization"
         description: "Measures curriculum translation and educational material adaptation"
         metrics:
           - name: "Curriculum Translation Coverage"
-            unit: "percentage"
-            target: "> 90"
+          unit: "percentage"
+          target: "> 90"
             critical: "< 70"
             query: "sum(translated_subjects) / sum(total_subjects) * 100"
             panel_type: "gauge"
             
           - name: "Educational Material Adaptation Success"
-            unit: "percentage"
-            target: "> 85"
+          unit: "percentage"
+          target: "> 85"
             critical: "< 65"
             query: "sum(adapted_materials) / sum(total_materials) * 100"
             panel_type: "gauge"
             
           - name: "Multilingual Content Quality Score"
-            unit: "score"
-            target: "> 4.0"
+          unit: "score"
+          target: "> 4.0"
             critical: "< 3.5"
             query: "avg(content_quality_score)"
             panel_type: "gauge"
       
-      student_engagement:
-        name: "Student Engagement"
+    student_engagement:
+      name: "Student Engagement"
         description: "Tracks learning platform usage and student interaction"
         metrics:
           - name: "Learning Platform Usage Across Languages"
@@ -365,7 +365,7 @@ sectors:
             panel_type: "gauge"
             
           - name: "Content Creation Assistance Metrics"
-            unit: "percentage"
+          unit: "percentage"
             target: "> 80"
             critical: "< 60"
             query: "sum(assisted_content_creation) / sum(total_content_creation) * 100"
@@ -391,7 +391,7 @@ sectors:
             
           - name: "Educational Equity Improvements"
             unit: "percentage"
-            target: "> 15"
+          target: "> 15"
             critical: "< 5"
             query: "avg(equity_improvement_percentage)"
             panel_type: "stat"
@@ -414,8 +414,8 @@ sectors:
       cost_efficiency: 85
     
     kpis:
-      business_operations:
-        name: "Business Operations"
+    business_operations:
+      name: "Business Operations"
         description: "Measures operational efficiency and business impact"
         metrics:
           - name: "Cost Savings from Translation Services"
@@ -433,8 +433,8 @@ sectors:
             panel_type: "stat"
             
           - name: "Operational Efficiency Gain"
-            unit: "percentage"
-            target: "> 20"
+          unit: "percentage"
+          target: "> 20"
             critical: "< 10"
             query: "avg(efficiency_gain)"
             panel_type: "gauge"
@@ -483,7 +483,7 @@ sectors:
             panel_type: "gauge"
             
           - name: "User Engagement Metrics"
-            unit: "percentage"
+          unit: "percentage"
             target: "> 75"
             critical: "< 55"
             query: "avg(user_engagement_rate)"
@@ -499,7 +499,7 @@ sectors:
       response_time: 4000
       community_impact: 80
     
-    kpis:
+      kpis:
       community_services:
         name: "Community Services"
         description: "Measures community outreach and service delivery"
@@ -530,7 +530,7 @@ sectors:
         description: "Measures resource optimization and cost effectiveness"
         metrics:
           - name: "Resource Utilization Efficiency"
-            unit: "percentage"
+          unit: "percentage"
             target: "> 80"
             critical: "< 60"
             query: "avg(resource_efficiency)"
@@ -555,8 +555,8 @@ sectors:
         description: "Measures service accessibility and community reach"
         metrics:
           - name: "Service Accessibility Score"
-            unit: "score"
-            target: "> 4.0"
+          unit: "score"
+          target: "> 4.0"
             critical: "< 3.5"
             query: "avg(accessibility_score)"
             panel_type: "gauge"

@@ -624,30 +624,30 @@ class RecommendationEngine:
             for template in templates:
                 # Calculate priority based on sector rules
                 priority = self._calculate_priority('performance', template, sector_rule, use_case_rule)
-                
-                # Calculate expected impact
+            
+            # Calculate expected impact
                 impact = self._calculate_impact(qos_analysis.performance_score, template['expected_impact'])
                 
                 # Calculate implementation effort
                 effort = self._calculate_effort(template['implementation_effort'])
-                
-                # Calculate confidence score
+            
+            # Calculate confidence score
                 confidence = self._calculate_confidence(qos_analysis, customer_profile)
-                
+            
                 # Calculate business value
                 business_value = self._calculate_business_value(impact, effort, customer_profile)
                 
-                recommendation = Recommendation(
+            recommendation = Recommendation(
                     recommendation_id=f"perf_{qos_analysis.tenant_id}_{len(recommendations)}",
                     tenant_id=qos_analysis.tenant_id,
-                    recommendation_type='performance',
-                    priority=priority,
-                    title=template['title'],
-                    description=template['description'],
+                recommendation_type='performance',
+                priority=priority,
+                title=template['title'],
+                description=template['description'],
                     expected_impact=template['expected_impact'],
-                    implementation_effort=template['implementation_effort'],
-                    status='pending',
-                    created_date=datetime.now(),
+                implementation_effort=template['implementation_effort'],
+                status='pending',
+                created_date=datetime.now(),
                     confidence_score=confidence,
                     business_value=business_value,
                     technical_details=template.get('technical_details'),
@@ -676,30 +676,30 @@ class RecommendationEngine:
             for template in templates:
                 # Calculate priority based on sector rules
                 priority = self._calculate_priority('reliability', template, sector_rule, use_case_rule)
-                
-                # Calculate expected impact
+            
+            # Calculate expected impact
                 impact = self._calculate_impact(qos_analysis.reliability_score, template['expected_impact'])
                 
                 # Calculate implementation effort
                 effort = self._calculate_effort(template['implementation_effort'])
-                
-                # Calculate confidence score
+            
+            # Calculate confidence score
                 confidence = self._calculate_confidence(qos_analysis, customer_profile)
-                
+            
                 # Calculate business value
                 business_value = self._calculate_business_value(impact, effort, customer_profile)
                 
-                recommendation = Recommendation(
+            recommendation = Recommendation(
                     recommendation_id=f"rel_{qos_analysis.tenant_id}_{len(recommendations)}",
                     tenant_id=qos_analysis.tenant_id,
-                    recommendation_type='reliability',
-                    priority=priority,
-                    title=template['title'],
-                    description=template['description'],
+                recommendation_type='reliability',
+                priority=priority,
+                title=template['title'],
+                description=template['description'],
                     expected_impact=template['expected_impact'],
-                    implementation_effort=template['implementation_effort'],
-                    status='pending',
-                    created_date=datetime.now(),
+                implementation_effort=template['implementation_effort'],
+                status='pending',
+                created_date=datetime.now(),
                     confidence_score=confidence,
                     business_value=business_value,
                     technical_details=template.get('technical_details'),
@@ -728,29 +728,29 @@ class RecommendationEngine:
             for template in templates:
                 # Calculate priority based on sector rules
                 priority = self._calculate_priority('capacity', template, sector_rule, use_case_rule)
-                
-                # Calculate expected impact
+            
+            # Calculate expected impact
                 impact = self._calculate_impact(qos_analysis.capacity_score, template['expected_impact'])
                 
                 # Calculate implementation effort
                 effort = self._calculate_effort(template['implementation_effort'])
-                
-                # Calculate confidence score
+            
+            # Calculate confidence score
                 confidence = self._calculate_confidence(qos_analysis, customer_profile)
-                
+            
                 # Calculate business value
                 business_value = self._calculate_business_value(impact, effort, customer_profile)
                 
-                recommendation = Recommendation(
+            recommendation = Recommendation(
                     recommendation_id=f"cap_{qos_analysis.tenant_id}_{len(recommendations)}",
                     tenant_id=qos_analysis.tenant_id,
-                    recommendation_type='capacity',
-                    title=template['title'],
-                    description=template['description'],
+                recommendation_type='capacity',
+                title=template['title'],
+                description=template['description'],
                     expected_impact=template['expected_impact'],
-                    implementation_effort=template['implementation_effort'],
-                    status='pending',
-                    created_date=datetime.now(),
+                implementation_effort=template['implementation_effort'],
+                status='pending',
+                created_date=datetime.now(),
                     priority=priority,
                     confidence_score=confidence,
                     business_value=business_value,
@@ -780,30 +780,30 @@ class RecommendationEngine:
             for template in templates:
                 # Calculate priority based on sector rules
                 priority = self._calculate_priority('feature', template, sector_rule, use_case_rule)
-                
-                # Calculate expected impact
+            
+            # Calculate expected impact
                 impact = self._calculate_impact(qos_analysis.utilization_score, template['expected_impact'])
                 
                 # Calculate implementation effort
                 effort = self._calculate_effort(template['implementation_effort'])
-                
-                # Calculate confidence score
+            
+            # Calculate confidence score
                 confidence = self._calculate_confidence(qos_analysis, customer_profile)
-                
+            
                 # Calculate business value
                 business_value = self._calculate_business_value(impact, effort, customer_profile)
                 
-                recommendation = Recommendation(
+            recommendation = Recommendation(
                     recommendation_id=f"feat_{qos_analysis.tenant_id}_{len(recommendations)}",
                     tenant_id=qos_analysis.tenant_id,
-                    recommendation_type='feature',
-                    priority=priority,
-                    title=template['title'],
-                    description=template['description'],
+                recommendation_type='feature',
+                priority=priority,
+                title=template['title'],
+                description=template['description'],
                     expected_impact=template['expected_impact'],
-                    implementation_effort=template['implementation_effort'],
-                    status='pending',
-                    created_date=datetime.now(),
+                implementation_effort=template['implementation_effort'],
+                status='pending',
+                created_date=datetime.now(),
                     confidence_score=confidence,
                     business_value=business_value,
                     technical_details=template.get('technical_details'),
@@ -879,9 +879,9 @@ class RecommendationEngine:
                 return base_impact * 1.5  # Higher impact for poor performance
             elif current_score < 75:
                 return base_impact * 1.2  # Moderate impact for average performance
-            else:
+                else:
                 return base_impact * 0.8  # Lower impact for good performance
-                
+            
         except Exception as e:
             logger.error(f"Error calculating impact: {e}")
             return 0.5
@@ -896,7 +896,7 @@ class RecommendationEngine:
             }
             
             return effort_scores.get(implementation_effort, 0.5)
-            
+                
         except Exception as e:
             logger.error(f"Error calculating effort: {e}")
             return 0.5
@@ -920,7 +920,7 @@ class RecommendationEngine:
             confidence = max(0, min(100, confidence))
             
             return confidence
-            
+                
         except Exception as e:
             logger.error(f"Error calculating confidence: {e}")
             return 50.0
@@ -1066,10 +1066,10 @@ if __name__ == "__main__":
         print(f"Trend Direction: {qos_analysis.trend_direction}")
         print(f"Critical Issues: {qos_analysis.critical_issues}")
         print(f"Optimization Opportunities: {qos_analysis.optimization_opportunities}")
-        
-        # Generate recommendations
+    
+    # Generate recommendations
         recommendations = engine.generate_recommendations(qos_analysis, customer_profile)
-        
+    
         print(f"\nGenerated {len(recommendations)} recommendations:")
         for i, rec in enumerate(recommendations, 1):
             print(f"{i}. {rec.title} ({rec.priority} priority)")

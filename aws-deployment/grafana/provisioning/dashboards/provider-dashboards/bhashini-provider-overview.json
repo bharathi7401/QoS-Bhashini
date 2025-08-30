@@ -1,0 +1,383 @@
+{
+  "id": null,
+  "title": "Bhashini Provider Overview",
+  "tags": ["bhashini", "provider", "overview", "qos", "sla"],
+  "style": "dark",
+  "timezone": "browser",
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "System Status",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"System Status\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
+            ]
+          },
+          "displayName": "System Status"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Average Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Response Time\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          },
+          "displayName": "Response Time"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "Error Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group()\n  |> mean()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Error Rate\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          },
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+    },
+    {
+      "id": 4,
+      "title": "Total API Calls",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group()\n  |> sum()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Total API Calls\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "mappings": [],
+          "unit": "short",
+          "displayName": "API Calls"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+    },
+    {
+      "id": 5,
+      "title": "Active Tenants",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> group(columns: [\"tenant_id\"])\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"Active Tenants\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "mappings": [],
+          "unit": "none",
+          "displayName": "Tenant Count"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8}
+    },
+    {
+      "id": 6,
+      "title": "SLA Compliance Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> filter(fn: (r) => r[\"value\"] >= 95.0)\n  |> group()\n  |> count()\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      metric: \"SLA Compliance\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "none",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          },
+          "displayName": "SLA Compliance"
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8}
+    },
+    {
+      "id": 7,
+      "title": "Service Performance Overview",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      availability: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Availability"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    },
+    {
+      "id": 8,
+      "title": "Response Time Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      response_time: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Response Time"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+    },
+    {
+      "id": 9,
+      "title": "Error Rate Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      error_rate: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          },
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+    },
+    {
+      "id": 10,
+      "title": "Throughput Trends",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1m, fn: sum, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      throughput: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "requests_per_minute",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "displayName": "Throughput"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+    },
+    {
+      "id": 11,
+      "title": "Tenant Performance Summary",
+      "type": "table",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\n  |> group(columns: [\"tenant_id\", \"sla_tier\"])\n  |> mean()\n  |> sort(columns: [\"tenant_id\"])\n  |> map(fn: (r) => ({\n      _time: r._time,\n      tenant: r.tenant_id,\n      sla_tier: r.sla_tier,\n      availability: r._value,\n      status: if r._value >= 99.0 then \"Excellent\" else if r._value >= 95.0 then \"Good\" else \"Poor\"\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "Tenant Performance"
+        }
+      },
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+    },
+    {
+      "id": 12,
+      "title": "Latency Heatmap by Service",
+      "type": "heatmap",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"latency\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      latency: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "displayName": "Latency"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+    },
+    {
+      "id": 13,
+      "title": "Error Rate Heatmap by Service",
+      "type": "heatmap",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\n  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")\n  |> group(columns: [\"service_name\"])\n  |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _value: r._value,\n      service: r.service_name,\n      error_rate: r._value\n    }))",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-working"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "Error Rate"
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40}
+    }
+  ],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "templating": {
+    "list": []
+  },
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "version": 1,
+  "links": [],
+  "uid": "bhashini-provider-overview"
+}

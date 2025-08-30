@@ -1,0 +1,429 @@
+{
+  "id": null,
+  "title": "Bhashini Customer Overview Dashboard",
+  "uid": "bhashini-customer-overview",
+  "tags": ["bhashini", "customer", "overview", "qos", "sla"],
+  "style": "dark",
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Customer Overview",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "Enterprise 1 - Availability",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.customer_id == \"enterprise_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 1}
+    },
+    {
+      "id": 3,
+      "title": "Enterprise 1 - Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.customer_id == \"enterprise_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 1}
+    },
+    {
+      "id": 4,
+      "title": "Enterprise 1 - Error Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.customer_id == \"enterprise_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 1}
+    },
+    {
+      "id": 5,
+              "title": "Enterprise 1 - Throughput (RPM)",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"throughput\" and r.customer_id == \"enterprise_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "reqps",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "green", "value": 1000}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 1}
+    },
+    {
+      "id": 6,
+      "title": "Startup 1 - Availability",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.customer_id == \"startup_2\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 9}
+    },
+    {
+      "id": 7,
+      "title": "Startup 1 - Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.customer_id == \"startup_2\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 9}
+    },
+    {
+      "id": 8,
+      "title": "Startup 1 - Error Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.customer_id == \"startup_2\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 9}
+    },
+    {
+      "id": 9,
+              "title": "Startup 1 - Throughput (RPM)",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"throughput\" and r.customer_id == \"startup_2\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "reqps",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "green", "value": 1000}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 9}
+    },
+    {
+      "id": 10,
+      "title": "Freemium 1 - Availability",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\" and r.customer_id == \"freemium_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 95},
+              {"color": "green", "value": 99}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 17}
+    },
+    {
+      "id": 11,
+      "title": "Freemium 1 - Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\" and r.customer_id == \"freemium_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 17}
+    },
+    {
+      "id": 12,
+      "title": "Freemium 1 - Error Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"error_rate\" and r.customer_id == \"freemium_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 17}
+    },
+    {
+      "id": 13,
+              "title": "Freemium 1 - Throughput (RPM)",
+      "type": "stat",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"throughput\" and r.customer_id == \"freemium_1\") |> group() |> mean()",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "unit": "reqps",
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "green", "value": 1000}
+            ]
+          }
+        }
+      },
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 17}
+    },
+    {
+      "id": 14,
+      "title": "Customer Performance Trends",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 25}
+    },
+    {
+      "id": 15,
+      "title": "All Customers - Availability Trend",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"availability\") |> aggregateWindow(every: 1m, fn: mean, createEmpty: false) |> sort(columns: [\"_time\"])",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "lineWidth": 3,
+            "fillOpacity": 15,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "pointSize": 5
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Time": "Time",
+              "value": "Availability"
+            }
+          }
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26}
+    },
+    {
+      "id": 16,
+      "title": "All Customers - Response Time Trend",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"qos_metrics\" and r._field == \"value\" and r.metric_type == \"latency\") |> aggregateWindow(every: 1m, fn: mean, createEmpty: false) |> sort(columns: [\"_time\"])",
+          "datasource": {"uid": "influxdb-qos-metrics"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "lineWidth": 3,
+            "fillOpacity": 15,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "pointSize": 5
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Time": "Time",
+              "value": "Response Time"
+            }
+          }
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 26}
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s"
+}

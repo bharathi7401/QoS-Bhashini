@@ -120,7 +120,7 @@ class CustomerProfiler:
             return 'NGO'
         
         # Default to private sector
-        return 'private'
+            return 'private'
     
     def _infer_use_case_from_sector(self, sector: str) -> str:
         """Infer use case category from sector"""

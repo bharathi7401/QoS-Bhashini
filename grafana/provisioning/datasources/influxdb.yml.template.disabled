@@ -2,11 +2,12 @@ apiVersion: 1
 
 datasources:
   - name: InfluxDB-QoS-Metrics
+    uid: influxdb-qos-metrics
     type: influxdb
     access: proxy
     url: http://influxdb:8086
     secureJsonData:
-      token: ${INFLUXDB_GRAFANA_TOKEN}
+      token: ${INFLUXDB_TOKEN}
     jsonData:
       version: Flux
       organization: ${INFLUXDB_ORG}

@@ -18,12 +18,12 @@ datasources:
       maxSeries: 10000
       defaultQuery: |
         // Customer tenant-isolated query template for enterprise_1
-        // Automatically filters by tenant_id for complete data isolation
+        // Automatically filters by customer_id for complete data isolation
         from(bucket: "${INFLUXDB_BUCKET}")
           |> range(start: -1h)
           |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
-          |> filter(fn: (r) => r["tenant_id"] == "enterprise_1")
-          |> group(columns: ["service_name", "metric_type"])
+          |> filter(fn: (r) => r["customer_id"] == "enterprise_1")
+          |> group(columns: ["service", "metric_type"])
           |> mean()
           |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     editable: false
@@ -46,12 +46,12 @@ datasources:
       maxSeries: 10000
       defaultQuery: |
         // Customer tenant-isolated query template for startup_2
-        // Automatically filters by tenant_id for complete data isolation
+        // Automatically filters by customer_id for complete data isolation
         from(bucket: "${INFLUXDB_BUCKET}")
           |> range(start: -1h)
           |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
-          |> filter(fn: (r) => r["tenant_id"] == "startup_2")
-          |> group(columns: ["service_name", "metric_type"])
+          |> filter(fn: (r) => r["customer_id"] == "startup_2")
+          |> group(columns: ["service", "metric_type"])
           |> mean()
           |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     editable: false
@@ -74,12 +74,12 @@ datasources:
       maxSeries: 10000
       defaultQuery: |
         // Customer tenant-isolated query template for freemium_1
-        // Automatically filters by tenant_id for complete data isolation
+        // Automatically filters by customer_id for complete data isolation
         from(bucket: "${INFLUXDB_BUCKET}")
           |> range(start: -1h)
           |> filter(fn: (r) => r["_measurement"] == "qos_metrics")
-          |> filter(fn: (r) => r["tenant_id"] == "freemium_1")
-          |> group(columns: ["service_name", "metric_type"])
+          |> filter(fn: (r) => r["customer_id"] == "freemium_1")
+          |> group(columns: ["service", "metric_type"])
           |> mean()
           |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     editable: false

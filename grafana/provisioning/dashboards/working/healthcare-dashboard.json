@@ -1,0 +1,1036 @@
+{
+  "id": null,
+  "title": "Healthcare Sector Dashboard",
+  "tags": [
+    "healthcare",
+    "patient-communication",
+    "medical-safety",
+    "telemedicine"
+  ],
+  "style": "dark",
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Patient Communication Quality",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 2,
+      "title": "Translation Accuracy for Medical Terms",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "avg(medical_translation_accuracy{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Medical Translation Accuracy"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 98
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": 3,
+      "title": "Response Time for Critical Health Communications",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(critical_communication_response_time{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Critical Response Time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      }
+    },
+    {
+      "id": 4,
+      "title": "Patient Satisfaction with Multilingual Services",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "avg(patient_satisfaction_score{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Patient Satisfaction"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 1,
+          "max": 5,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 1
+              },
+              {
+                "color": "yellow",
+                "value": 4.0
+              },
+              {
+                "color": "green",
+                "value": 4.5
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      }
+    },
+    {
+      "id": 5,
+      "title": "Safety Monitoring",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      }
+    },
+    {
+      "id": 6,
+      "title": "Error Rate in Medical Translations",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(translation_error_rate{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Translation Error Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 1.0
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 10
+      }
+    },
+    {
+      "id": 7,
+      "title": "Critical Communication Delivery Success",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(successful_critical_deliveries{tenant_id=\"$tenant_id\"}) / sum(total_critical_communications{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "Critical Delivery Success"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 10
+      }
+    },
+    {
+      "id": 8,
+      "title": "Healthcare Data Privacy Compliance",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "avg(hipaa_compliance_score{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "HIPAA Compliance"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 98
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 10
+      }
+    },
+    {
+      "id": 9,
+      "title": "Accessibility",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      }
+    },
+    {
+      "id": 10,
+      "title": "Language Coverage for Patient Populations",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "count(distinct(patient_language{tenant_id=\"$tenant_id\"}))",
+          "legendFormat": "Languages Supported"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 8
+              },
+              {
+                "color": "green",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 19
+      }
+    },
+    {
+      "id": 11,
+      "title": "Special Needs Accommodation",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(accommodated_patients{tenant_id=\"$tenant_id\"}) / sum(total_patients{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "Special Needs Accommodation"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 85
+              },
+              {
+                "color": "green",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 19
+      }
+    },
+    {
+      "id": 12,
+      "title": "Healthcare Service Reach",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(served_patients{tenant_id=\"$tenant_id\"}) / sum(total_patients{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "Service Reach"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 75
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 19
+      }
+    },
+    {
+      "id": 13,
+      "title": "Telemedicine Support",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      }
+    },
+    {
+      "id": 14,
+      "title": "Real-time Interpretation Quality",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "avg(interpretation_quality_score{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Interpretation Quality"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 1,
+          "max": 5,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 1
+              },
+              {
+                "color": "yellow",
+                "value": 4.0
+              },
+              {
+                "color": "green",
+                "value": 4.5
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 28
+      }
+    },
+    {
+      "id": 15,
+      "title": "Medical Consultation Support Effectiveness",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(successful_consultations{tenant_id=\"$tenant_id\"}) / sum(total_consultations{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "Consultation Success Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 85
+              },
+              {
+                "color": "green",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 28
+      }
+    },
+    {
+      "id": 16,
+      "title": "Remote Patient Communication Success",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(successful_remote_communications{tenant_id=\"$tenant_id\"}) / sum(total_remote_communications{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "Remote Communication Success"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 28
+      }
+    },
+    {
+      "id": 17,
+      "title": "Clinical Workflow",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      }
+    },
+    {
+      "id": 18,
+      "title": "Electronic Health Record Integration",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(integrated_records{tenant_id=\"$tenant_id\"}) / sum(total_records{tenant_id=\"$tenant_id\"}) * 100",
+          "legendFormat": "EHR Integration"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 85
+              },
+              {
+                "color": "green",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 37
+      }
+    },
+    {
+      "id": 19,
+      "title": "Medical Staff Efficiency Improvement",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(efficiency_improvement{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Efficiency Improvement"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 37
+      }
+    },
+    {
+      "id": 20,
+      "title": "Patient Care Coordination",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "avg(care_coordination_score{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Care Coordination"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 1,
+          "max": 5,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 1
+              },
+              {
+                "color": "yellow",
+                "value": 4.0
+              },
+              {
+                "color": "green",
+                "value": 4.5
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 37
+      }
+    },
+    {
+      "id": 21,
+      "title": "Critical Metrics Trends",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      }
+    },
+    {
+      "id": 22,
+      "title": "Medical Translation Accuracy Trend",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg(medical_translation_accuracy{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Translation Accuracy %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 98
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 46
+      }
+    },
+    {
+      "id": 23,
+      "title": "Critical Communication Response Time Trend",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg(critical_communication_response_time{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Response Time (seconds)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 46
+      }
+    },
+    {
+      "id": 24,
+      "title": "Patient Safety Metrics",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg(translation_error_rate{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Translation Error Rate %"
+        },
+        {
+          "expr": "avg(hipaa_compliance_score{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "HIPAA Compliance Score"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 55
+      }
+    },
+    {
+      "id": 25,
+      "title": "Service Availability and Performance",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg(availability{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Availability %"
+        },
+        {
+          "expr": "avg(response_time{tenant_id=\"$tenant_id\"})",
+          "legendFormat": "Response Time (ms)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 55
+      }
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "query": "tenant_id",
+        "current": {
+          "value": "$tenant_id",
+          "text": "$tenant_id"
+        },
+        "options": []
+      },
+      {
+        "name": "tenant_name",
+        "type": "query",
+        "query": "tenant_name",
+        "current": {
+          "value": "$tenant_name",
+          "text": "$tenant_name"
+        },
+        "options": []
+      },
+      {
+        "name": "medical_department",
+        "type": "custom",
+        "query": "All,Emergency,Cardiology,Oncology,Pediatrics,General Medicine,Specialty Care",
+        "current": {
+          "value": "All",
+          "text": "All"
+        },
+        "options": [
+          {
+            "value": "All",
+            "text": "All"
+          },
+          {
+            "value": "Emergency",
+            "text": "Emergency"
+          },
+          {
+            "value": "Cardiology",
+            "text": "Cardiology"
+          },
+          {
+            "value": "Oncology",
+            "text": "Oncology"
+          },
+          {
+            "value": "Pediatrics",
+            "text": "Pediatrics"
+          },
+          {
+            "value": "General Medicine",
+            "text": "General Medicine"
+          },
+          {
+            "value": "Specialty Care",
+            "text": "Specialty Care"
+          }
+        ]
+      },
+      {
+        "name": "patient_demographics",
+        "type": "custom",
+        "query": "All,Adults,Children,Elderly,Special Needs,Multi-lingual",
+        "current": {
+          "value": "All",
+          "text": "All"
+        },
+        "options": [
+          {
+            "value": "All",
+            "text": "All"
+          },
+          {
+            "value": "Adults",
+            "text": "Adults"
+          },
+          {
+            "value": "Children",
+            "text": "Children"
+          },
+          {
+            "value": "Elderly",
+            "text": "Elderly"
+          },
+          {
+            "value": "Special Needs",
+            "text": "Special Needs"
+          },
+          {
+            "value": "Multi-lingual",
+            "text": "Multi-lingual"
+          }
+        ]
+      },
+      {
+        "name": "communication_urgency",
+        "type": "custom",
+        "query": "All,Routine,Urgent,Critical,Emergency",
+        "current": {
+          "value": "All",
+          "text": "All"
+        },
+        "options": [
+          {
+            "value": "All",
+            "text": "All"
+          },
+          {
+            "value": "Routine",
+            "text": "Routine"
+          },
+          {
+            "value": "Urgent",
+            "text": "Urgent"
+          },
+          {
+            "value": "Critical",
+            "text": "Critical"
+          },
+          {
+            "value": "Emergency",
+            "text": "Emergency"
+          }
+        ]
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Healthcare Safety Alerts",
+        "datasource": {"uid": "influxdb-qos-metrics"},
+        "enable": true,
+        "expr": "healthcare_safety_alerts",
+        "iconColor": "red",
+        "tags": [
+          "healthcare",
+          "safety",
+          "alerts"
+        ]
+      },
+      {
+        "name": "Critical Communication Alerts",
+        "datasource": {"uid": "influxdb-qos-metrics"},
+        "enable": true,
+        "expr": "critical_communication_alerts",
+        "iconColor": "orange",
+        "tags": [
+          "healthcare",
+          "critical",
+          "communication"
+        ]
+      }
+    ]
+  },
+  "refresh": "30s",
+  "schemaVersion": 30,
+  "version": 1,
+  "links": [],
+  "gnetId": null,
+  "uid": "healthcare-sector-dashboard"
+}

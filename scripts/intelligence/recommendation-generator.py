@@ -573,9 +573,9 @@ class RecommendationGenerator:
                 created_date=datetime.now()
             )
             recommendations.append(recommendation)
-        
-        return recommendations
-    
+            
+            return recommendations
+            
     def _generate_reliability_recommendations(self, qos_analysis: QoSAnalysis,
                                            customer_profile: Dict[str, Any],
                                            sector: str, use_case: str) -> List[Recommendation]:
@@ -601,9 +601,9 @@ class RecommendationGenerator:
                 created_date=datetime.now()
             )
             recommendations.append(recommendation)
-        
-        return recommendations
-    
+            
+            return recommendations
+            
     def _generate_capacity_recommendations(self, qos_analysis: QoSAnalysis,
                                         customer_profile: Dict[str, Any],
                                         sector: str, use_case: str) -> List[Recommendation]:
@@ -629,9 +629,9 @@ class RecommendationGenerator:
                 created_date=datetime.now()
             )
             recommendations.append(recommendation)
-        
-        return recommendations
-    
+            
+            return recommendations
+            
     def _generate_feature_adoption_recommendations(self, qos_analysis: QoSAnalysis,
                                                 customer_profile: Dict[str, Any],
                                                 sector: str, use_case: str) -> List[Recommendation]:
@@ -657,9 +657,9 @@ class RecommendationGenerator:
                 created_date=datetime.now()
             )
             recommendations.append(recommendation)
-        
-        return recommendations
-    
+            
+            return recommendations
+            
     def _calculate_priority(self, score: float, sector: str) -> str:
         """Calculate recommendation priority"""
         sector_rules = self.sector_rules.get(sector, {})

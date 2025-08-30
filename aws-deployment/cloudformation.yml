@@ -1,0 +1,229 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Bhashini QoS Dashboards - AWS Infrastructure (Mumbai Region)'
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.medium
+    Description: EC2 instance type (t3.medium recommended for Mumbai region)
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+  
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+  
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the instance will be launched
+  
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID where the instance will be launched
+
+Resources:
+  # Security Group for EC2 Instance
+  DashboardSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Bhashini Dashboard server
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: SSH access
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP access
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS access
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+          Description: Grafana direct access
+        - IpProtocol: tcp
+          FromPort: 8086
+          ToPort: 8086
+          CidrIp: 0.0.0.0/0
+          Description: InfluxDB access
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic
+
+  # IAM Role for EC2 Instance
+  DashboardInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  # IAM Instance Profile
+  DashboardInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref DashboardInstanceRole
+
+  # EC2 Instance
+  DashboardInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0100e5499b14d1d16  # Amazon Linux 2023 x86_64 (Mumbai region)
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      IamInstanceProfile: !Ref DashboardInstanceProfile
+      SecurityGroupIds:
+        - !Ref DashboardSecurityGroup
+      SubnetId: !Ref SubnetId
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y docker git
+          systemctl start docker
+          systemctl enable docker
+          
+          # Install Docker Compose
+          curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          
+          # Create application directory
+          mkdir -p /opt/bhashini-dashboards
+          cd /opt/bhashini-dashboards
+          
+          # Clone or copy application files
+          # (You'll need to upload your files or clone from a repo)
+          
+          # Start services
+          docker-compose up -d
+          
+          # Create a simple status page
+          echo "<html><body><h1>Bhashini Dashboards</h1><p>Deployment in progress...</p></body></html>" > /var/www/html/index.html
+          
+          # Install and start nginx
+          yum install -y nginx
+          systemctl start nginx
+          systemctl enable nginx
+          
+          # Configure nginx to proxy to docker services
+          cat > /etc/nginx/conf.d/dashboards.conf << 'EOF'
+          server {
+              listen 80;
+              server_name _;
+              
+              location / {
+                  proxy_pass http://localhost:3000;
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto \$scheme;
+              }
+          }
+          EOF
+          
+          systemctl reload nginx
+          
+          # Output instance metadata
+          echo "Instance ID: $(curl -s http://169.254.169.254/latest/meta-data/instance-id)" >> /var/log/user-data.log
+          echo "Public IP: $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)" >> /var/log/user-data.log
+          echo "Region: ap-south-1 (Mumbai)" >> /var/log/user-data.log
+      
+      Tags:
+        - Key: Name
+          Value: Bhashini-Dashboard-Server
+        - Key: Project
+          Value: Bhashini-QoS-Dashboards
+        - Key: Environment
+          Value: Production
+        - Key: Region
+          Value: Mumbai
+
+  # Note: Not creating Elastic IP due to region limit
+  # Instance will use its public IP address
+
+  # CloudWatch Dashboard
+  DashboardCloudWatchDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: Bhashini-Dashboard-Monitoring-Mumbai
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  ["AWS/EC2", "CPUUtilization", "InstanceId", "${DashboardInstance}"],
+                  [".", "NetworkIn", ".", "."],
+                  [".", "NetworkOut", ".", "."]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "EC2 Instance Metrics (Mumbai Region)"
+              }
+            }
+          ]
+        }
+
+Outputs:
+  DashboardInstanceId:
+    Description: ID of the EC2 instance
+    Value: !Ref DashboardInstance
+    Export:
+      Name: !Sub "${AWS::StackName}-InstanceId"
+
+  DashboardPublicIP:
+    Description: Public IP address of the dashboard server
+    Value: !GetAtt DashboardInstance.PublicIp
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicIP"
+
+  DashboardURL:
+    Description: URL to access the dashboards
+    Value: !Sub "http://${DashboardInstance.PublicIp}"
+    Export:
+      Name: !Sub "${AWS::StackName}-DashboardURL"
+
+  GrafanaURL:
+    Description: Direct Grafana access URL
+    Value: !Sub "http://${DashboardInstance.PublicIp}:3000"
+    Export:
+      Name: !Sub "${AWS::StackName}-GrafanaURL"
+
+  SecurityGroupId:
+    Description: Security Group ID
+    Value: !Ref DashboardSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupId"
+
+  Region:
+    Description: AWS Region where resources are deployed
+    Value: !Ref AWS::Region
+    Export:
+      Name: !Sub "${AWS::StackName}-Region"
