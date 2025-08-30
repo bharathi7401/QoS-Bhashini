@@ -45,7 +45,7 @@ providers:
   #   updateIntervalSeconds: 30
   #   allowUiUpdates: true
   #   options:
-  #     path: /etc/grafana/provisioning/dashboards/tenant-dashboards
+  #       path: /etc/grafana/provisioning/dashboards/tenant-dashboards
   #       foldersFromFilesStructure: true
 
   # Customer overview dashboard for Bhashini team
