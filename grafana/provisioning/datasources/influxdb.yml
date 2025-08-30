@@ -5,7 +5,7 @@ datasources:
     uid: influxdb-qos-metrics
     type: influxdb
     access: proxy
-    url: http://127.0.0.1:8086
+    url: http://influxdb:8086
     secureJsonData:
       token: admin-token-123
     jsonData:
