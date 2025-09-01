@@ -1,0 +1,911 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 16,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 11,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "latency = from(bucket: \"qos_metrics\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._field == \"value\" and r.metric_type == \"latency\")\r\n  |> group(columns: [])\r\n\r\np95 = latency\r\n  |> quantile(q: 0.95, method: \"exact_selector\")\r\n  |> map(fn: (r) => ({ Percentile: \"p95\", Latency: r._value }))\r\n\r\np99 = latency\r\n  |> quantile(q: 0.99, method: \"exact_selector\")\r\n  |> map(fn: (r) => ({ Percentile: \"p99\", Latency: r._value }))\r\n\r\nunion(tables: [p95, p99])\r\n  |> keep(columns: [\"Percentile\", \"Latency\"])\r\n\r\n",
+            "refId": "A"
+          }
+        ],
+        "title": "Latency Distribution (ms)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 70
+                },
+                {
+                  "color": "red",
+                  "value": 85
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 13,
+        "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "latency = from(bucket: \"qos_metrics\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._field == \"value\" and r.metric_type == \"latency\")\r\n  |> group(columns: [\"service\"])\r\n\r\np95 = latency\r\n  |> quantile(q: 0.95, method: \"exact_selector\")\r\n  |> map(fn: (r) => ({ service: r.service, Percentile: \"p95\", Latency: r._value }))\r\n\r\np99 = latency\r\n  |> quantile(q: 0.99, method: \"exact_selector\")\r\n  |> map(fn: (r) => ({ service: r.service, Percentile: \"p99\", Latency: r._value }))\r\n\r\nunion(tables: [p95, p99])\r\n  |> keep(columns: [\"service\", \"Percentile\", \"Latency\"])\r\n  |> pivot(rowKey: [\"service\"], columnKey: [\"Percentile\"], valueColumn: \"Latency\")\r\n",
+            "refId": "A"
+          }
+        ],
+        "title": "Service Level Latency Distribution (ms)",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 8
+        },
+        "id": 1,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\") |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"availability\") |> group() |> mean()",
+            "refId": "A"
+          }
+        ],
+        "title": "System Status",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-BlPu"
+            },
+            "fieldMinMax": true,
+            "mappings": [],
+            "max": 101,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 8
+        },
+        "id": 14,
+        "options": {
+          "displayMode": "basic",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "text": {},
+          "valueMode": "color"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"qos_metrics\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"metric_type\"] == \"availability\")\r\n  |> group(columns: [\"service\"])\r\n  |> mean()\r\n  |> map(fn: (r) => ({\r\n    service: \r\n      if r.service == \"translation\" then \"Translation Availability\"\r\n      else if r.service == \"tts\" then \"TTS Availability\"\r\n      else if r.service == \"asr\" then \"ASR Availability\"\r\n      else r.service,\r\n    value: r._value,\r\n    _time: r._time\r\n  }))",
+            "refId": "A"
+          }
+        ],
+        "title": "Service Level Availability (%)",
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 8
+        },
+        "id": 3,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> group() |> distinct(column: \"customer_id\") |> count()",
+            "refId": "A"
+          }
+        ],
+        "title": "Active Tenants",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "ms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 8
+        },
+        "id": 4,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"latency\") |> group() |> mean()",
+            "refId": "A"
+          }
+        ],
+        "title": "Average Response Time",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 16
+        },
+        "id": 5,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\") |> group() |> mean()",
+            "refId": "A"
+          }
+        ],
+        "title": "Overall Error Rate",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 16
+        },
+        "id": 2,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> group() |> count()",
+            "refId": "A"
+          }
+        ],
+        "title": "Total API Calls",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 16
+        },
+        "id": 7,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\") |> group() |> max()",
+            "refId": "A"
+          }
+        ],
+        "title": "Peak Throughput (requests/min)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 16
+        },
+        "id": 10,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"throughput\") |> group() |> mean()",
+            "refId": "A"
+          }
+        ],
+        "title": "Average Throughput (requests/min)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "dark-green",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 24
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\")  |> range(start: -1h)  |> filter(fn: (r) => r[\"_field\"] == \"value\")  |> filter(fn: (r) => r[\"metric_type\"] == \"error_rate\")  |> group()  |> mean()  |> map(fn: (r) => ({ r with _value: 100.0 - 0.1 }))",
+            "refId": "A"
+          }
+        ],
+        "title": "Overall Success Rate",
+        "transformations": [],
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 6,
+          "x": 18,
+          "y": 24
+        },
+        "id": 12,
+        "options": {
+          "displayMode": "lcd",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "valueMode": "color"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "import \"strings\"\r\n\r\nfrom(bucket: \"qos_metrics\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._field == \"value\" and r.metric_type == \"throughput\")\r\n  |> group(columns: [\"service\"])\r\n  |> mean()\r\n  |> keep(columns: [\"service\", \"_value\"])\r\n  |> map(fn: (r) => ({ r with service: strings.toUpper(v: r.service) }))\r\n  |> rename(columns: {_value: \"Throughput\"})\r\n",
+            "refId": "A"
+          }
+        ],
+        "title": "Service-wise Average Throughput (requests/min)",
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 31
+        },
+        "id": 8,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> group() |> distinct(column: \"service\") |> count()",
+            "refId": "A"
+          }
+        ],
+        "title": "Service Count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-qos-metrics"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 32
+        },
+        "id": 6,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.2.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "influxdb-qos-metrics"
+            },
+            "query": "from(bucket: \"qos_metrics\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> filter(fn: (r) => r[\"metric_type\"] == \"availability\") |> filter(fn: (r) => r[\"_value\"] >= 99.0) |> group() |> count()",
+            "refId": "A"
+          }
+        ],
+        "title": "SLA Compliance",
+        "type": "stat"
+      }
+    ],
+    "refresh": "",
+    "schemaVersion": 38,
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Bhashini Ultimate QoS Overview Copy",
+    "uid": "a0aaf9e5-ca68-463e-b59d-0b56995669dc",
+    "version": 4,
+    "weekStart": ""
+  }
