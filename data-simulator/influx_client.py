@@ -64,6 +64,8 @@ class InfluxDBClientWrapper:
                 # Convert metrics to InfluxDB Point objects
                 points = []
                 for metric in metrics_batch:
+                    self.logger.info(f"Writing metric: {metric}")
+                    print("The metric is: ", metric)
                     point = Point(metric['measurement'])
 
                     # Add tags
@@ -72,7 +74,10 @@ class InfluxDBClientWrapper:
 
                     # Add fields
                     for field_key, field_value in metric['fields'].items():
-                        point.field(field_key, field_value)
+                        if field_key == 'value':
+                            point.field(field_key, float(field_value))
+                        else:
+                            point.field(field_key, field_value)
 
                     # Add timestamp
                     if isinstance(metric['time'], datetime):

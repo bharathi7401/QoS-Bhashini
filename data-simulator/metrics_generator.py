@@ -123,6 +123,59 @@ class MetricsGenerator:
 
         return float(round(availability, 2))
 
+    def generate_data_processed(self, service_name, tenant_id):
+        """Generate data processed per request."""
+        service_config = self.config.SERVICES[service_name]
+        tenant_config = self.config.TENANTS[tenant_id]
+
+        # Gaussian variation for realistic per-request values
+        mean = service_config['data_processed']['mean']
+        std = service_config['data_processed']['std']
+        per_request = max(1, np.random.normal(mean, std))
+
+        # Apply tenant traffic multiplier
+        per_request *= tenant_config['traffic_multiplier']
+
+        return float(round(per_request, 2)), service_config['data_processed']['unit']
+
+    def generate_concurrent_users(self, service_name, tenant_id):
+        """Simulate concurrent users supported."""
+        tenant_config = self.config.TENANTS[tenant_id]
+
+        base_users = 50  # baseline
+        # Premium tenants handle more concurrent users
+        if tenant_config['sla_tier'] == 'premium':
+            base_users = 200
+        elif tenant_config['sla_tier'] == 'standard':
+            base_users = 100
+        elif tenant_config['sla_tier'] == 'basic':
+            base_users = 50
+
+        # Add variability
+        users = np.random.normal(base_users, base_users * 0.1)
+
+        return max(1, int(users))
+
+    def generate_regional_coverage(self, service_name):
+        return self.config.REGIONAL_COVERAGE.get(service_name, 0)
+
+    def generate_user_satisfaction(self, service_name, tenant_id):
+        """Generate a satisfaction index (0–100)."""
+        tenant_config = self.config.TENANTS[tenant_id]
+
+        base_score = 80  # baseline satisfaction
+        if tenant_config['sla_tier'] == 'premium':
+            base_score = 90
+        elif tenant_config['sla_tier'] == 'basic':
+            base_score = 70
+
+        # Add randomness
+        score = np.random.normal(base_score, 5)
+
+        # Clamp
+        return float(round(min(100, max(50, score)), 2))
+
+
     def generate_metrics_batch(self):
         """Generate a complete batch of metrics for all services and tenants"""
         metrics = []
@@ -135,6 +188,7 @@ class MetricsGenerator:
                 error_rate = self.generate_error_rate(service_name, tenant_id)
                 throughput = self.generate_throughput(service_name, tenant_id)
                 availability = self.generate_availability(service_name, tenant_id)
+                data_processed, unit = self.generate_data_processed(service_name, tenant_id)
 
                 # Create metric points for each metric type
                 service_tag = service_name.lower()
@@ -194,7 +248,64 @@ class MetricsGenerator:
                             'unit': 'percent'
                         },
                         'time': self.current_time
+                    },
+                    {
+                        'measurement': 'qos_metrics',
+                        'tags': {
+                            'customer_id': tenant_id,
+                            'service': service_tag,
+                            'metric_type': 'data_processed',
+                            'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
+                        },
+                        'fields': {
+                            'value': data_processed,
+                            'unit': unit
+                        },
+                        'time': self.current_time
+                    },
+                    {
+                        'measurement': 'qos_metrics',
+                        'tags': {
+                            'customer_id': tenant_id,
+                            'service': service_tag,
+                            'metric_type': 'concurrent_users',
+                            'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
+                        },
+                        'fields': {
+                            'value': self.generate_concurrent_users(service_name, tenant_id),
+                            'unit': 'users'
+                        },
+                        'time': self.current_time
+                    },
+                    {
+                        'measurement': 'qos_metrics',
+                        'tags': {
+                            'customer_id': tenant_id,
+                            'service': service_tag,
+                            'metric_type': 'regional_coverage',
+                            'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
+                        },
+                        'fields': {
+                            'value': self.generate_regional_coverage(service_name),
+                            'unit': 'languages'
+                        },
+                        'time': self.current_time
+                    },
+                    {
+                        'measurement': 'qos_metrics',
+                        'tags': {
+                            'customer_id': tenant_id,
+                            'service': service_tag,
+                            'metric_type': 'user_satisfaction',
+                            'sla_tier': self.config.TENANTS[tenant_id]['sla_tier']
+                        },
+                        'fields': {
+                            'value': self.generate_user_satisfaction(service_name, tenant_id),
+                            'unit': 'percent'
+                        },
+                        'time': self.current_time
                     }
+
                 ])
 
         return metrics
@@ -204,7 +315,7 @@ class MetricsGenerator:
         return {
             'services_count': len(self.config.SERVICES),
             'tenants_count': len(self.config.TENANTS),
-            'metrics_per_batch': len(self.config.SERVICES) * len(self.config.TENANTS) * 4,
+            'metrics_per_batch': len(self.config.SERVICES) * len(self.config.TENANTS) * 8,
             'current_time': self.current_time.isoformat(),
             'time_multiplier': self.get_time_multiplier()
         }

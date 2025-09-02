@@ -32,6 +32,11 @@ class Config:
             'throughput': {
                 'base': 100,  # requests per minute
                 'peak_multiplier': 2.5
+            },
+            'data_processed': {
+                'unit': 'characters',
+                'mean': 5000,
+                'std': 1000
             }
         },
         'tts': {
@@ -49,6 +54,11 @@ class Config:
             'throughput': {
                 'base': 80,
                 'peak_multiplier': 2.0
+            },
+            'data_processed': {
+                'unit': 'minutes',
+                'mean': 2.0,
+                'std': 0.5
             }
         },
         'asr': {
@@ -66,6 +76,11 @@ class Config:
             'throughput': {
                 'base': 90,
                 'peak_multiplier': 2.2
+            },
+            'data_processed': {
+                'unit': 'minutes',
+                'mean': 3.0,
+                'std': 0.7
             }
         }
     }
@@ -136,3 +151,10 @@ class Config:
         'retry_delay': 1,   # seconds
         'correlation_factor': 0.7  # correlation between load and latency
     }
+
+    REGIONAL_COVERAGE = {
+        'translation': 22,   # languages supported
+        'tts': 15,
+        'asr': 18
+    }
+
